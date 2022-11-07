@@ -1,0 +1,26 @@
+GET http://localhost:5000/rounds
+
+###
+
+GET http://localhost:5000/rounds/636985da538c2b36bcac1656
+
+###
+
+POST http://localhost:5000/rounds
+Content-Type: application/json
+
+{
+  "name": "first round"
+}
+
+###
+
+DELETE http://localhost:5000/rounds/63699100f06f1117c1401a40
+
+### 
+PATCH http://localhost:5000/rounds/636985da538c2b36bcac1656
+Content-Type: application/json
+
+{
+  "name": "Modified Name"
+}
