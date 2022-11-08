@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Round = require("../models/rounds");
 
-// Get all
+// Get all rounds
 router.get("/", async (req, res) => {
   try {
     const rounds = await Round.find();
@@ -12,16 +12,14 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get one
+// Get one round
 router.get("/:id", getRound, (req, res) => {
   res.json(res.round);
 });
 
-// Create one
+// Create one round
 router.post("/", async (req, res) => {
-  const round = new Round({
-    name: req.body.name,
-  });
+  const round = new Round(req.body);
 
   try {
     const newRound = await round.save();
@@ -31,10 +29,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update one
+// Update one round
 router.patch("/:id", getRound, async (req, res) => {
-  if (req.body.name != null) {
-    res.round.name = req.body.name;
+  if (req.body.deals != null) {
+    res.round.deals = req.body.deals;
   }
 
   try {
@@ -45,7 +43,7 @@ router.patch("/:id", getRound, async (req, res) => {
   }
 });
 
-// Delete one
+// Delete one round
 router.delete("/:id", getRound, async (req, res) => {
   try {
     await res.round.remove();
@@ -69,4 +67,6 @@ async function getRound(req, res, next) {
   res.round = round;
   next();
 }
+
+router.post;
 module.exports = router;

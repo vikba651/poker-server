@@ -13,4 +13,4 @@ const playerSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Round", playerSchema);
+module.exports = mongoose.model("Player", playerSchema);

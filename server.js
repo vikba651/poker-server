@@ -14,7 +14,9 @@ db.once("open", () => console.log("Connected to database"));
 app.use(express.json());
 
 const roundsRouter = require("./routes/rounds");
+const playersRouter = require("./routes/players");
 app.use("/rounds", roundsRouter);
+app.use("/players", playersRouter);
 
 app
   .listen(5000, () => console.log("Server started"))

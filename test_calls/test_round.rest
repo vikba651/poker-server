@@ -1,0 +1,38 @@
+GET http://localhost:5000/rounds
+
+###
+
+GET http://localhost:5000/rounds/636987983aa988c6cc9c54cc
+
+###
+
+POST http://localhost:5000/rounds
+Content-Type: application/json
+
+{
+  "deals":[{
+    "playerCards":[
+      {"suit": "C", "rank": "2"},
+      {"suit": "K", "rank": "3"}
+    ],
+    "tableCards":[
+      {"suit": "C", "rank": "A"},
+      {"suit": "D", "rank": "3"},
+      {"suit": "S", "rank": "K"},
+      {"suit": "H", "rank": "D"},
+      {"suit": "H", "rank": "5"}
+    ]
+  }]
+}
+
+###
+
+DELETE http://localhost:5000/rounds/63698e8b4774a7ec96482e61
+
+### 
+PATCH http://localhost:5000/rounds/636985da538c2b36bcac1656
+Content-Type: application/json
+
+{
+  "name": "Modified Name"
+}
