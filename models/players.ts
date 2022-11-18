@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import * as mongoose from 'mongoose'
 
 const playerSchema = new mongoose.Schema({
   // deals: {},
@@ -11,6 +11,6 @@ const playerSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
-});
+})
 
-module.exports = mongoose.model("Player", playerSchema);
+export default mongoose.model('Player', playerSchema)

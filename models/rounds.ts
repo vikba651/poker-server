@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import * as mongoose from 'mongoose'
 
 const roundSchema = new mongoose.Schema({
   // creator: {
@@ -47,6 +47,6 @@ const roundSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
-});
+})
 
-module.exports = mongoose.model("Round", roundSchema);
+export default mongoose.model('Round', roundSchema)
