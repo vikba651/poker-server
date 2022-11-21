@@ -24,7 +24,15 @@ mongoose.connect(`${process.env.DATABASE_URL}`, (error) => {
 const port: number = process.env.PORT ? +process.env.PORT : 8999
 server.listen(port, () => {
   console.log(`Server started on http://localhost:${port} :)`)
-})
+}).on("error", function (err) {
+  process.once("SIGUSR2", function () {
+    process.kill(process.pid, "SIGUSR2");
+  });
+  process.on("SIGINT", function () {
+    // this is only called on ctrl+c, not restart
+    process.kill(process.pid, "SIGINT");
+  });
+});
 
 // ****** HTTP STUFF ******
 
