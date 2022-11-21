@@ -69,6 +69,7 @@ wss.on('connection', (ws: Socket) => {
     sessions.push(session)
     ws.join(session.id.toString())
     ws.emit('sessionCreated', session)
+    ws.broadcast.emit('sendLocation', data.location, session.code)
   })
 
   ws.on('joinSession', (data) => {
