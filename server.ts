@@ -8,6 +8,9 @@ import { networkInterfaces } from 'os'
 
 import roundsRouter from './routes/rounds'
 import playersRouter from './routes/players'
+import { registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
+import { registerLobbyHandlers } from './socket_handlers/lobbyHandlers'
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './types/websocket'
 
 dotenv.config()
 
@@ -50,7 +53,7 @@ app.get('/', (req: Request, res: Response) => {
 
 // ******* WEB SOCKET STUFF *******
 
-const wss = new Server(server, {
+const wss = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(server, {
   cors: {
     origin: '*',
   },
@@ -61,46 +64,8 @@ const clients: Socket[] = []
 wss.on('connection', (ws: Socket) => {
   clients.push(ws)
   console.log('Connected:', ws.id.substring(0, 3))
-
-  ws.on('createSession', (data: { name: string; location: any }) => {
-    const session: Session = {
-      id: sessions.length.toString(),
-      code: createCode(),
-      creator: data.name,
-      players: [data.name],
-    }
-    sessions.push(session)
-    ws.join(session.id)
-    ws.emit('sessionCreated', session)
-    ws.broadcast.emit('sendLocation', data.location, session.code)
-  })
-
-  ws.on('joinSession', (data: { code: string; name: string }) => {
-    let session = sessions.find((session) => session.code === data.code)
-    if (session) {
-      session.players.push(data.name)
-      ws.join(session.id)
-      wss.in(session.id).emit('sessionUpdated', session)
-    } else {
-      ws.send('Invalid session code')
-    }
-  })
-
-  ws.on('updateTableCards', (data: { cards: any; sessionId: string }) => {
-    const tableCards = data.cards
-    const sessionId = data.sessionId
-    ws.to(sessionId).emit('tableCardsUpdated', tableCards)
-  })
-
-  ws.on('startTracking', (data: { sessionId: string }) => {
-    const sessionId = data.sessionId
-    ws.to(sessionId).emit('trackingStarted')
-  })
-
-  ws.on('onNewDeal', (data: { sessionId: string }) => {
-    const sessionId = data.sessionId
-    ws.to(sessionId).emit('newDeal')
-  })
+  registerTrackGameHandlers(wss, ws)
+  registerLobbyHandlers(wss, ws)
 
   ws.on('disconnect', () => {
     console.log('Disconnected:', ws.id.substring(0, 3))
@@ -109,25 +74,6 @@ wss.on('connection', (ws: Socket) => {
   })
 
   ws.onAny((eventName) => {
-    console.log('Emitted:', eventName)
+    console.log('Event:', eventName)
   })
 })
-
-let sessions: Session[] = []
-interface Session {
-  id: string
-  code: string
-  creator: string
-  players: string[]
-}
-
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-function createCode(): string {
-  let res = ''
-  for (let i = 0; i < 4; i++) {
-    const randomIndex = Math.floor(Math.random() * ALPHABET.length)
-    res = res.concat(ALPHABET[randomIndex])
-  }
-  return res
-}
