@@ -1,5 +1,14 @@
-import { cardStringToArray } from './poker-logic'
 import { suits, ranks } from './constant'
+
+export function cardStringToArray(handString: string) {
+  let cardArray = handString.split(' ').map((card) => {
+    return {
+      rank: card.charAt(0),
+      suit: card.charAt(1),
+    }
+  })
+  return cardArray
+}
 
 function sampleArray(array: any, n: any) {
   // Modifies array inplace
@@ -14,15 +23,15 @@ function sampleArray(array: any, n: any) {
 
 function customIncludes(sourceCards: any, targetCard: any) {
   for (let card of sourceCards) {
-    if ((card.suit === targetCard.suit) && (card.rank === targetCard.rank)) {
+    if (card.suit === targetCard.suit && card.rank === targetCard.rank) {
       return true
     }
   }
   return false
 }
 
-export function generateDealGiven(playerCards: any, nOpponents: any) {
-  if (nOpponents > 20) {
+export function generateDealGiven(playerCards: any, playerAmount: any) {
+  if (playerAmount > 20) {
     throw 'You cant have more than 20 players!'
   }
   let deck: any = []
@@ -34,7 +43,7 @@ export function generateDealGiven(playerCards: any, nOpponents: any) {
       })
     })
   })
-  playerCards = cardStringToArray(playerCards)
+  // playerCards = cardStringToArray(playerCards)
 
   deck = deck.filter((card: any) => {
     return !customIncludes(playerCards, card)
@@ -43,7 +52,7 @@ export function generateDealGiven(playerCards: any, nOpponents: any) {
 
   let generated_hands = [playerCards.concat(tableCards)]
 
-  for (let i = 0; i < nOpponents; i++) {
+  for (let i = 0; i < playerAmount - 1; i++) {
     let opponentCards = sampleArray(deck, 2)
     generated_hands.push(opponentCards.concat(tableCards))
   }

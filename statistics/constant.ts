@@ -22,3 +22,13 @@ export interface Card {
   suit: string
   rank: string
 }
+
+export interface HandQuality {
+  hand: string
+  quads: Card[][]
+  triples: Card[][]
+  pairs: Card[][]
+  cards: Card[]
+  dealtCards: Card[]
+  score: number
+}
