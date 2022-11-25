@@ -1,29 +1,35 @@
-interface Session {
+import { Socket } from 'socket.io'
+
+export interface Session {
   id: string
   code: string
   creator: string
-  players: string[]
-  deals?: Deal[]
+  players: Player[]
+  deals: Deal[]
 }
 
-interface Deal {
+export interface Player {
+  id: string
+  name: string
+}
+
+export interface PlayerSocket {
+  socket: Socket<any>
+  player: Player
+}
+
+export interface Deal {
+  id: number
   playerCards: PlayerCards[]
   tableCards: Card[]
 }
 
-interface PlayerCards {
+export interface PlayerCards {
   name: string
   cards: Card[]
 }
 
-interface Card {
-  suit: Suit
+export interface Card {
+  suit: string
   value: string
-}
-
-enum Suit {
-  HEART,
-  CLUB,
-  DIAMOND,
-  SPADE,
 }
