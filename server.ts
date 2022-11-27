@@ -50,7 +50,6 @@ mongoose.connect(`${process.env.DATABASE_URL}`, (error) => {
   }
 })
 
-simulateAllPlayerCards(4)
 // ****** HTTP STUFF ******
 
 app.use(bodyParser.urlencoded({ extended: false }))

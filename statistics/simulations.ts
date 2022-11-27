@@ -9,12 +9,12 @@ let score: any = {
   lose: 0,
 }
 
-export async function simulateAllPlayerCards(playerAmount: number) {
+export async function simulateAllPlayerCards(playerAmount: number, iterations: number) {
   console.log('Lets simulate some')
   ranks.forEach((firstRank) => {
     ranks.forEach((secondRank) => {
       if (ranks.indexOf(firstRank) <= ranks.indexOf(secondRank)) {
-        simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}C`), playerAmount)
+        simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}C`), playerAmount, iterations)
       }
     })
   })
@@ -22,16 +22,15 @@ export async function simulateAllPlayerCards(playerAmount: number) {
   ranks.forEach((firstRank) => {
     ranks.forEach((secondRank) => {
       if (ranks.indexOf(firstRank) < ranks.indexOf(secondRank)) {
-        simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}H`), playerAmount)
+        simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}H`), playerAmount, iterations)
       }
     })
   })
 }
 
-export async function simulatePlayerCards(playerCards: Card[], playerAmount: number) {
+export async function simulatePlayerCards(playerCards: Card[], playerAmount: number, iterations: number) {
   let time = Date.now()
   let wins = 0
-  let iterations = 10000
 
   for (let i = 0; i < iterations; i++) {
     let deal = generateDealGiven(playerCards, playerAmount)
