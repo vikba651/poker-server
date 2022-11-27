@@ -11,6 +11,7 @@ import playersRouter from './routes/players'
 import { registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
 import { registerLobbyHandlers } from './socket_handlers/lobbyHandlers'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './types/websocket'
+import { simulateAllPlayerCards } from './statistics/simulations'
 
 dotenv.config()
 
@@ -27,9 +28,19 @@ try {
 }
 
 const port: number = process.env.PORT ? +process.env.PORT : 8999
-server.listen(port, () => {
-  console.log(`Server started on http://${localAddr}:${port} :)`)
-})
+server
+  .listen(port, () => {
+    console.log(`Server started on http://localhost:${port} :)`)
+  })
+  .on('error', function (err) {
+    process.once('SIGUSR2', function () {
+      process.kill(process.pid, 'SIGUSR2')
+    })
+    process.on('SIGINT', function () {
+      // this is only called on ctrl+c, not restart
+      process.kill(process.pid, 'SIGINT')
+    })
+  })
 
 mongoose.connect(`${process.env.DATABASE_URL}`, (error) => {
   if (error) {
