@@ -10,6 +10,7 @@ let score: any = {
 }
 
 export async function simulateAllPlayerCards(playerAmount: number) {
+  console.log('Lets simulate some')
   ranks.forEach((firstRank) => {
     ranks.forEach((secondRank) => {
       if (ranks.indexOf(firstRank) <= ranks.indexOf(secondRank)) {
@@ -30,7 +31,7 @@ export async function simulateAllPlayerCards(playerAmount: number) {
 export async function simulatePlayerCards(playerCards: Card[], playerAmount: number) {
   let time = Date.now()
   let wins = 0
-  let iterations = 100000
+  let iterations = 10000
 
   for (let i = 0; i < iterations; i++) {
     let deal = generateDealGiven(playerCards, playerAmount)
@@ -65,19 +66,34 @@ export async function simulatePlayerCards(playerCards: Card[], playerAmount: num
     ranks.indexOf(playerCards[0].rank) < ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank
   let lowCard =
     ranks.indexOf(playerCards[0].rank) > ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank
-  const playerCardQuality = new PlayerCardQuality({
-    winRate: wins / iterations,
-    highCard,
-    lowCard,
-    suited: playerCards[0].suit === playerCards[1].suit,
-    playerAmount,
-  })
+
+  let playerCardQualities = await PlayerCardQuality.find({ lowCard, highCard, playerAmount })
+  let playerCardQuality
+
+  if (playerCardQualities.length) {
+    playerCardQuality = playerCardQualities[0]
+  } else {
+    playerCardQuality = new PlayerCardQuality({
+      winRate: wins / iterations,
+      highCard,
+      lowCard,
+      suited: playerCards[0].suit === playerCards[1].suit,
+      playerAmount,
+      iterations,
+    })
+  }
+
+  const newWinRate = wins / iterations
+  playerCardQuality.winRate =
+    (playerCardQuality.winRate * playerCardQuality.iterations + newWinRate * iterations) /
+    (iterations + playerCardQuality.iterations)
+  playerCardQuality.iterations += iterations
   const newPlayerCardQuality = await playerCardQuality.save()
   console.log(
     `Completed in ${Date.now() - time} ms. ${playerCards[1].rank}${suitEmoji[suits.indexOf(playerCards[1].suit)]} ${
       playerCards[0].rank
-    }${suitEmoji[suits.indexOf(playerCards[0].suit)]},  playerAmount: ${playerCardQuality.playerAmount}, Winrate: ${
-      playerCardQuality.winRate
-    }`
+    }${suitEmoji[suits.indexOf(playerCards[0].suit)]},  playerAmount: ${playerCardQuality.playerAmount}, iterations: ${
+      playerCardQuality.iterations
+    }, Win Rate: ${playerCardQuality.winRate}`
   )
 }

@@ -6,6 +6,7 @@ const playerCardQualitySchema = new mongoose.Schema({
   highCard: { type: String, required: true },
   suited: { type: Boolean, required: true },
   playerAmount: { type: Number, required: true },
+  iterations: { type: Number, required: true, default: 10000 },
 })
 
 export default mongoose.model('PlayerCardQuality', playerCardQualitySchema)
