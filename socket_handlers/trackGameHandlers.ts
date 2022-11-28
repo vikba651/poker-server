@@ -49,7 +49,6 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   }
 
   const endGame = (data: { cards: Card[]; sessionId: string; currentDeal: number }) => {
-    // Add tablecards to session
     const session = sessions.find((session) => session.id === data.sessionId)
     const player = playerSockets.find((player) => player.socket === ws)?.player
     if (player && session) {
@@ -63,7 +62,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
       } else {
         console.error(`Deal ${data.currentDeal} has not been created`)
       }
-      postRound(session, player)
+      postRound(session)
     } else {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
     }
@@ -74,7 +73,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   ws.on('endGame', endGame)
 }
 
-export const postRound = async (session: Session, player?: Player) => {
+const postRound = async (session: Session) => {
   try {
     const roundExists = await RoundModel.findByIdAndUpdate(session.id, {
       deals: session.deals,

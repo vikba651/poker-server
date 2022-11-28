@@ -8,10 +8,9 @@ import { networkInterfaces } from 'os'
 
 import roundsRouter from './routes/rounds'
 import playersRouter from './routes/players'
-import { postRound, registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
+import { registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
 import { registerLobbyHandlers } from './socket_handlers/lobbyHandlers'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './types/websocket'
-import { simulateAllPlayerCards } from './statistics/simulations'
 
 dotenv.config()
 
@@ -88,100 +87,3 @@ wss.on('connection', (ws: Socket) => {
     console.log('Event:', eventName)
   })
 })
-
-const sessionExample = {
-  id: '0',
-  code: 'CHKA',
-  creator: 'Asd',
-  players: [
-    {
-      id: '3ceea829-0f04-4996-89c5-ff26c69f85db',
-      name: 'Asd',
-    },
-  ],
-  deals: [
-    {
-      id: 1,
-      playerCards: [
-        {
-          name: 'Asd',
-          cards: [
-            {
-              value: '3',
-              suit: 'ASSHOLE ASSHOLE',
-            },
-            {
-              value: '2',
-              suit: 'heart',
-            },
-          ],
-        },
-      ],
-      tableCards: [
-        {
-          value: '4',
-          suit: 'diamond',
-        },
-        {
-          value: 'K',
-          suit: 'club',
-        },
-        {
-          value: 'K',
-          suit: 'diamond',
-        },
-        {
-          value: '',
-          suit: '',
-        },
-        {
-          value: '',
-          suit: '',
-        },
-      ],
-    },
-    {
-      id: 2,
-      playerCards: [
-        {
-          name: 'Asd',
-          cards: [
-            {
-              value: '4',
-              suit: 'diamond',
-            },
-            {
-              value: '2',
-              suit: 'spade',
-            },
-          ],
-        },
-      ],
-      tableCards: [
-        {
-          value: 'Q',
-          suit: 'diamond',
-        },
-        {
-          value: '2',
-          suit: 'club',
-        },
-        {
-          value: 'K',
-          suit: 'diamond',
-        },
-        {
-          value: 'K',
-          suit: 'spade',
-        },
-        {
-          value: 'Q',
-          suit: 'club',
-        },
-      ],
-    },
-  ],
-  startTime: 1669414903677,
-}
-
-// postRound(sessionExample)
