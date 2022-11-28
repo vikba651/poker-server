@@ -6,6 +6,7 @@ export interface Session {
   creator: string
   players: Player[]
   deals: Deal[]
+  startTime: number
 }
 
 export interface Player {

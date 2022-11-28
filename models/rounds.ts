@@ -1,52 +1,26 @@
-import * as mongoose from 'mongoose'
+import { model, Schema } from 'mongoose'
 
-const roundSchema = new mongoose.Schema({
-  // creator: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "Player",
-  //   //required: true,
-  // },
-  // players: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "Player",
-  //   },
-  // ],
-  deals: [
-    [
-      {
-        playerCards: [
-          {
-            suite: {
-              type: String,
-              required: true,
-            },
-            rank: {
-              type: String,
-              required: true,
-            },
-          },
-        ],
-        tableCards: [
-          {
-            suite: {
-              type: String,
-              required: true,
-            },
-            rank: {
-              type: String,
-              required: true,
-            },
-          },
-        ],
-      },
-    ],
-  ],
-  date: {
-    type: Date,
-    required: true,
-    default: Date.now,
-  },
+const CardSchema = new Schema({
+  suit: String,
+  value: String,
 })
 
-export default mongoose.model('Round', roundSchema)
+const PlayerCardsSchema = new Schema({
+  name: String,
+  cards: [CardSchema],
+})
+
+const DealSchema = new Schema({
+  id: Number,
+  playerCards: [PlayerCardsSchema],
+  tableCards: [CardSchema],
+})
+
+const RoundSchema = new Schema({
+  _id: String,
+  deals: [DealSchema],
+  startTime: Number,
+})
+export const DealModel = model('Deal', DealSchema)
+
+export const RoundModel = model('Round', RoundSchema)

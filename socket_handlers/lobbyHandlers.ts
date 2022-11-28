@@ -22,11 +22,12 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     }
 
     const session: Session = {
-      id: sessions.length.toString(),
+      id: uuidv4(),
       code: createCode(),
       creator: data.name,
       players: [player],
       deals: [firstDeal],
+      startTime: Date.now(),
     }
     sessions.push(session)
     ws.join(session.id)

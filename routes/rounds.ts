@@ -1,13 +1,13 @@
 import { Router } from 'express'
 // const Round = require('../models/rounds')
 
-import Round from '../models/rounds'
+import { RoundModel } from '../models/rounds'
 
 const router = Router()
 // Get all rounds
 router.get('/', async (req: any, res: any) => {
   try {
-    const rounds = await Round.find()
+    const rounds = await RoundModel.find()
     res.json(rounds)
   } catch (e: any) {
     res.status(500).json({ message: e.message })
@@ -21,7 +21,7 @@ router.get('/:id', getRound, (req: any, res: any) => {
 
 // Create one round
 router.post('/', async (req: any, res: any) => {
-  const round = new Round(req.body)
+  const round = new RoundModel(req.body)
 
   try {
     const newRound = await round.save()
@@ -58,7 +58,7 @@ router.delete('/:id', getRound, async (req: any, res: any) => {
 async function getRound(req: any, res: any, next: any) {
   let round
   try {
-    round = await Round.findById(req.params.id)
+    round = await RoundModel.findById(req.params.id)
     if (round == null) {
       return res.status(404).json({ message: 'Cannot find round' })
     }
