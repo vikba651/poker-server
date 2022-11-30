@@ -1,16 +1,12 @@
-import * as mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 
-const playerSchema = new mongoose.Schema({
-  // deals: {},
-  name: {
-    type: String,
-    required: true,
-  },
+const playerSchema = new Schema({
+  name: String,
+  roundIds: [String],
   createDate: {
     type: Date,
-    required: true,
     default: Date.now,
   },
 })
 
-export default mongoose.model('Player', playerSchema)
+export const PlayerModel = model('Player', playerSchema)

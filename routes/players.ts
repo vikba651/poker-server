@@ -1,33 +1,40 @@
 import { Router } from 'express'
 
-import Player from '../models/players'
+import { PlayerModel } from '../models/players'
+import { RoundModel } from '../models/rounds'
 
 const router = Router()
 
-// Get all players
-router.get('/', async (req: any, res: any) => {
-  try {
-    const players = await Player.find()
-    res.json(players)
-  } catch (e: any) {
-    res.status(500).json({ message: e.message })
+// Get player with name
+router.post('/', getPlayer, async (req: any, res: any) => {
+  if (res.player !== null) {
+    res.json(res.player)
+  } else {
+    res.status(404).json({ message: 'Could not find player' })
   }
 })
 
-// Get one player
-router.get('/:id', getPlayer, (req: any, res: any) => {
-  res.json(res.player)
-})
-
 // Create one player
-router.post('/', async (req: any, res: any) => {
-  const player = new Player(req.body)
-  console.log(req.body)
+router.post('/create', async (req: any, res: any) => {
+  const player = new PlayerModel(req.body)
   try {
     const newPlayer = await player.save()
     res.status(200).json(newPlayer)
   } catch (e: any) {
     res.status(400)
+  }
+})
+
+router.post('/rounds', getPlayer, async (req: any, res: any) => {
+  if (res.player !== null) {
+    const roundIds: string[] = res.player.roundIds
+    let rounds: any[] = []
+    if (roundIds.length > 0) {
+      rounds = await RoundModel.find({ _id: { $in: roundIds } })
+    }
+    res.status(200).json(rounds)
+  } else {
+    res.status(404).json({ message: 'Could not find player' })
   }
 })
 
@@ -58,7 +65,7 @@ router.delete('/:id', getPlayer, async (req: any, res: any) => {
 async function getPlayer(req: any, res: any, next: any) {
   let player
   try {
-    player = await Player.findById(req.params.id)
+    player = await PlayerModel.findOne({ name: req.body.name })
     if (player == null) {
       return res.status(404).json({ message: 'Cannot find player' })
     }

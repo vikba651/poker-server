@@ -2,6 +2,7 @@ import { Server, Socket } from 'socket.io'
 import { Card, Deal, Player, PlayerCards, Session } from '../types/session'
 import { playerSockets, sessions } from './lobbyHandlers'
 import { RoundModel } from '../models/rounds'
+import { PlayerModel } from '../models/players'
 
 export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   const newDeal = (data: { sessionId: string; cards: Card[]; deal: number }) => {
@@ -62,7 +63,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
       } else {
         console.error(`Deal ${data.currentDeal} has not been created`)
       }
-      postRound(session)
+      postRound(session, player)
     } else {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
     }
@@ -73,7 +74,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   ws.on('endGame', endGame)
 }
 
-const postRound = async (session: Session) => {
+const postRound = async (session: Session, player: Player) => {
   try {
     const roundExists = await RoundModel.findByIdAndUpdate(session.id, {
       deals: session.deals,
@@ -86,14 +87,16 @@ const postRound = async (session: Session) => {
         deals: session.deals,
         startTime: session.startTime,
       })
-      try {
-        await round.save()
-        console.log('Posted round successfully')
-      } catch (e: any) {
-        console.log('Could not post newRound', round)
-      }
+      await round.save()
+      console.log('Posted round successfully')
     }
+    await PlayerModel.findOneAndUpdate(
+      { name: player.name },
+      {
+        $push: { roundIds: session.id },
+      }
+    )
   } catch (e: any) {
-    return console.error(e)
+    console.log('Could not post newRound', e)
   }
 }
