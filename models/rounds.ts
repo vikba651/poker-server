@@ -21,6 +21,5 @@ const RoundSchema = new Schema({
   deals: [DealSchema],
   startTime: Number,
 })
-export const DealModel = model('Deal', DealSchema)
 
 export const RoundModel = model('Round', RoundSchema)
