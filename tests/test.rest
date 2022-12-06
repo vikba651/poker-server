@@ -1,0 +1,26 @@
+GET http://localhost:8020/rounds
+
+###
+
+GET http://localhost:8020/rounds/47b94b42-f39e-4a03-a4d3-db8c33b387a1
+
+###
+
+POST http://localhost:8020/rounds
+Content-Type: application/json
+
+{
+  "name": "first round"
+}
+
+###
+
+DELETE http://localhost:8020/rounds/636985da538c2b36bcac1656
+
+### 
+PATCH http://localhost:8020/rounds/636985da538c2b36bcac1656
+Content-Type: application/json
+
+{
+  "name": "Modified Name"
+}
