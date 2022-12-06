@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io'
-import { Card, Deal, Player, PlayerCards, Session } from '../types/session'
+import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/session'
 import { playerSockets, sessions } from './lobbyHandlers'
 import { RoundModel } from '../models/rounds'
 import { PlayerModel } from '../models/players'
@@ -49,7 +49,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
     }
   }
 
-  const endGame = (data: { cards: Card[]; sessionId: string; currentDeal: number }) => {
+  const endGame = (data: { cards: Card[]; sessionId: string; currentDeal: number }, callback: any) => {
     const session = sessions.find((session) => session.id === data.sessionId)
     const player = playerSockets.find((player) => player.socket === ws)?.player
     if (player && session) {
@@ -63,7 +63,13 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
       } else {
         console.error(`Deal ${data.currentDeal} has not been created`)
       }
-      postRound(session, player)
+      const round: Round = {
+        _id: session.id,
+        deals: session.deals,
+        startTime: session.startTime,
+      }
+      postRound(round, player)
+      callback(round)
     } else {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
     }
@@ -74,26 +80,22 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   ws.on('endGame', endGame)
 }
 
-const postRound = async (session: Session, player: Player) => {
+const postRound = async (round: Round, player: Player) => {
   try {
-    const roundExists = await RoundModel.findByIdAndUpdate(session.id, {
-      deals: session.deals,
+    const roundExists = await RoundModel.findByIdAndUpdate(round._id, {
+      deals: round.deals,
     })
     if (roundExists) {
       console.log('Updated round successfully')
     } else {
-      let round = new RoundModel({
-        _id: session.id,
-        deals: session.deals,
-        startTime: session.startTime,
-      })
-      await round.save()
+      let roundModel = new RoundModel(round)
+      await roundModel.save()
       console.log('Posted round successfully')
     }
     await PlayerModel.findOneAndUpdate(
       { name: player.name },
       {
-        $push: { roundIds: session.id },
+        $push: { roundIds: round._id },
       }
     )
   } catch (e: any) {

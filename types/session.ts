@@ -1,5 +1,10 @@
 import { Socket } from 'socket.io'
 
+export interface Round {
+  _id: string
+  deals: Deal[]
+  startTime: number
+}
 export interface Session {
   id: string
   code: string
