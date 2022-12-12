@@ -1,12 +1,24 @@
 import { getHandQuality } from './poker-logic'
 import { cardStringToArray, generateDealGiven } from './card-generation'
 import { cardArrayToString, handQualityToString } from './to-strings'
+import { PlayerCardQualityType } from '../types/statistics'
+import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/session'
 import PlayerCardQuality from '../models/statistics'
-import { Card, ranks, suitEmoji, suits } from './constant'
+import { ranks, suitEmoji, suits } from './constant'
 
 let score: any = {
   win: 1,
   lose: 0,
+}
+
+export function getPlayerCardsKey(playerCards: Card[]): string {
+  let highCard =
+    ranks.indexOf(playerCards[0].rank) < ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank
+  let lowCard =
+    ranks.indexOf(playerCards[0].rank) > ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank
+  let suited = playerCards[0].suit === playerCards[1].suit
+
+  return lowCard + highCard + (suited ? 's' : '')
 }
 
 export async function simulateAllPlayerCards(playerAmount: number, iterations: number) {
@@ -43,11 +55,6 @@ export async function simulatePlayerCards(playerCards: Card[], playerAmount: num
       return a.score - b.score
     })
 
-    // handQualities.forEach((handQuality) => {
-    //   console.log('-----')
-    //   handQualityToString(handQuality)
-    // })
-
     let winScore = handQualities.slice(-1)[0].score
     let winningHandQualities = handQualities.filter((handQuality) => {
       return handQuality.score === winScore
@@ -61,32 +68,25 @@ export async function simulatePlayerCards(playerCards: Card[], playerAmount: num
       wins += 1 / winningHandQualities.length
     }
   }
-  let highCard =
-    ranks.indexOf(playerCards[0].rank) < ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank
-  let lowCard =
-    ranks.indexOf(playerCards[0].rank) > ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank
+  const cardsKey = getPlayerCardsKey(playerCards)
 
-  let playerCardQualities = await PlayerCardQuality.find({ lowCard, highCard, playerAmount })
-  let playerCardQuality
+  let playerCardQuality = await PlayerCardQuality.findOne({ cardsKey, playerAmount })
 
-  if (playerCardQualities.length) {
-    playerCardQuality = playerCardQualities[0]
-  } else {
-    playerCardQuality = new PlayerCardQuality({
-      winRate: wins / iterations,
-      highCard,
-      lowCard,
-      suited: playerCards[0].suit === playerCards[1].suit,
-      playerAmount,
-      iterations,
-    })
-  }
+  playerCardQuality = !!playerCardQuality
+    ? playerCardQuality
+    : new PlayerCardQuality({
+        winRate: wins / iterations,
+        cardsKey,
+        playerAmount,
+        iterations,
+      })
 
   const newWinRate = wins / iterations
   playerCardQuality.winRate =
     (playerCardQuality.winRate * playerCardQuality.iterations + newWinRate * iterations) /
     (iterations + playerCardQuality.iterations)
   playerCardQuality.iterations += iterations
+
   const newPlayerCardQuality = await playerCardQuality.save()
   console.log(
     `Completed in ${Date.now() - time} ms. ${playerCards[1].rank}${suitEmoji[suits.indexOf(playerCards[1].suit)]} ${

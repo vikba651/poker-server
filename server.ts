@@ -11,6 +11,7 @@ import playersRouter from './routes/players'
 import { registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
 import { registerLobbyHandlers } from './socket_handlers/lobbyHandlers'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './types/websocket'
+import { simulateAllPlayerCards } from './statistics/simulations'
 
 dotenv.config()
 
