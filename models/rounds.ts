@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose'
 
 const CardSchema = new Schema({
   suit: String,
-  value: String,
+  rank: String,
 })
 
 const PlayerCardsSchema = new Schema({

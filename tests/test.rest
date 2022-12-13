@@ -1,0 +1,41 @@
+GET http://localhost:8020/rounds
+
+###
+
+GET http://localhost:8020/rounds/playerCardQuality/d00bca84-bf29-45da-9aff-f60df6d6b5f3/4/Martin
+
+###
+
+GET http://localhost:8020/rounds/bestHandPlayer/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
+
+###
+
+GET http://localhost:8020/rounds/worstHandPlayer/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
+
+###
+
+GET http://localhost:8020/rounds/handSummary/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
+
+###
+
+GET http://localhost:8020/rounds/d00bca84-bf29-45da-9aff-f60df6d6b5f3
+###
+
+POST http://localhost:8020/rounds
+Content-Type: application/json
+
+{
+  "name": "first round"
+}
+
+###
+
+DELETE http://localhost:8020/rounds/636985da538c2b36bcac1656
+
+### 
+PATCH http://localhost:8020/rounds/636985da538c2b36bcac1656
+Content-Type: application/json
+
+{
+  "name": "Modified Name"
+}

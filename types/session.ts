@@ -37,5 +37,5 @@ export interface PlayerCards {
 
 export interface Card {
   suit: string
-  value: string
+  rank: string
 }
