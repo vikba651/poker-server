@@ -1,6 +1,6 @@
 export const suitEmoji = ['♧', '♦', '♥', '♤']
 export const suits = ['C', 'D', 'H', 'S']
-export const ranks: string[] = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+export const ranks: string[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 export const hands = [
   'Straight flush',
   'Four of a kind',

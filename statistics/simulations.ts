@@ -6,11 +6,6 @@ import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/sessio
 import PlayerCardQuality from '../models/statistics'
 import { ranks, suitEmoji, suits } from './constant'
 
-let score: any = {
-  win: 1,
-  lose: 0,
-}
-
 export function getPlayerCardsKey(playerCards: Card[]): string {
   let highCard =
     ranks.indexOf(playerCards[0].rank) < ranks.indexOf(playerCards[1].rank) ? playerCards[0].rank : playerCards[1].rank

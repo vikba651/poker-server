@@ -3,8 +3,8 @@ import { suits, ranks } from './constant'
 export function cardStringToArray(handString: string) {
   let cardArray = handString.split(' ').map((card) => {
     return {
-      rank: card.charAt(0),
-      suit: card.charAt(1),
+      rank: card.slice(0, -1),
+      suit: card.slice(-1),
     }
   })
   return cardArray
