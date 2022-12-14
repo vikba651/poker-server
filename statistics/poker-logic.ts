@@ -1,4 +1,7 @@
-import { ranks, hands, Card, HandQuality } from './constant'
+import { Card } from '../types/round'
+import { HandResult } from '../types/statistics'
+import { ranks, hands } from './constant'
+
 interface Groups {
   [key: string]: Card[]
 }
@@ -75,9 +78,9 @@ function filterSets(cardArray: Card[], sets: Card[][]): Card[] {
   return newCardArray
 }
 
-export function getHandQuality(cardArray: Card[]): HandQuality {
+export function getHandResult(cardArray: Card[]): HandResult {
   const rankGroups = groupBy(cardArray, 'rank')
-  let handQuality: HandQuality = {
+  let handQuality: HandResult = {
     hand: '',
     quads: [],
     triples: [],

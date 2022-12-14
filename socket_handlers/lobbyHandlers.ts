@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io'
-import { Player, PlayerSocket, Session } from '../types/session'
+import { Player, PlayerSocket, Session } from '../types/round'
 import { v4 as uuidv4 } from 'uuid'
 
 export let sessions: Session[] = []
