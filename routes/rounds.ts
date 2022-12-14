@@ -140,45 +140,45 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
     userSummaries.push(userSummary)
   })
 
-  let deals: DealSummary[] = []
+  // let deals: DealSummary[] = []
 
-  res.round.deal.forEach((deal: Deal) => {
-    let playerCardSummary: PlayerCardsSummary = {
-      name: '',
-      cards: [],
-      hand: '',
-      quads: [],
-      triples: [],
-      pairs: [],
-      dealtCards: [],
-      score: 0,
-    }
+  // res.round.deal.forEach((deal: Deal) => {
+  //   let playerCardSummary: PlayerCardsSummary = {
+  //     name: '',
+  //     cards: [],
+  //     hand: '',
+  //     quads: [],
+  //     triples: [],
+  //     pairs: [],
+  //     dealtCards: [],
+  //     score: 0,
+  //   }
 
-    deal.playerCards.forEach((playerCard: PlayerCards) => {
-      if (!!playerCard && playerCard.cards.length == 2 && deal.tableCards.length >= 3) {
-        const handResult = getHandResult(playerCard.cards.concat(deal.tableCards))
+  //   deal.playerCards.forEach((playerCard: PlayerCards) => {
+  //     if (!!playerCard && playerCard.cards.length == 2 && deal.tableCards.length >= 3) {
+  //       const handResult = getHandResult(playerCard.cards.concat(deal.tableCards))
 
-        playerCardSummary = {
-          name: playerCard.name,
-          cards: playerCard.cards,
-          hand: handResult.hand,
-          quads: handResult.quads,
-          triples: handResult.triples,
-          pairs: handResult.pairs,
-          dealtCards: handResult.dealtCards,
-          score: handResult.score,
-        }
-        return playerCardSummary
-      }
-    })
+  //       playerCardSummary = {
+  //         name: playerCard.name,
+  //         cards: playerCard.cards,
+  //         hand: handResult.hand,
+  //         quads: handResult.quads,
+  //         triples: handResult.triples,
+  //         pairs: handResult.pairs,
+  //         dealtCards: handResult.dealtCards,
+  //         score: handResult.score,
+  //       }
+  //       return playerCardSummary
+  //     }
+  //   })
 
-    let dealSummary: DealSummary = {
-      playerCards: playerCardSummary,
-      tableCards: deal.tableCards,
-    }
+  //   let dealSummary: DealSummary = {
+  //     playerCards: playerCardSummary,
+  //     tableCards: deal.tableCards,
+  //   }
 
-    return
-  })
+  //   return
+  // })
 
   const roundStatistic: RoundStatistics = {
     userSummaries,
