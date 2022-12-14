@@ -9,27 +9,29 @@ export interface HandResult {
   dealtCards: Card[]
   score: number
 }
-interface RoundStatistics {
-  userSummary: UserSummary[]
+export interface RoundStatistics {
+  userSummaries: UserSummary[]
   deals?: DealSummary[]
 }
 
-interface UserSummary {
+export interface UserSummary {
   name: string
-  handSummary: {
-    straightFlushes: number
-    quads: number
-    fullHouses: number
-    flushes: number
-    straights: number
-    triples: number
-    twoPairs: number
-    pairs: number
-    highCards: number
-  }
+  handSummary: HandSummary
   qualities: number[]
-  worstDeal: HandResult
-  bestDeal: HandResult
+  worstDeal?: HandResult
+  bestDeal?: HandResult
+}
+
+export interface HandSummary {
+  straightFlushes: number
+  quads: number
+  fullHouses: number
+  flushes: number
+  straights: number
+  triples: number
+  twoPairs: number
+  pairs: number
+  highCards: number
 }
 
 interface DealSummary {

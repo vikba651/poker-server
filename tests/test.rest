@@ -2,11 +2,11 @@ GET http://localhost:8020/rounds
 
 ###
 
-GET http://localhost:8020/rounds/playerCardQuality/d00bca84-bf29-45da-9aff-f60df6d6b5f3/4/Martin
+GET http://localhost:8020/rounds/roundSummary/d00bca84-bf29-45da-9aff-f60df6d6b5f3/
 
 ###
 
-GET http://localhost:8020/rounds/bestHandPlayer/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
+GET http://localhost:8020/rounds/bestHandPlayer/d00bca84-bf29-45da-9aff-f60df6d6b5f3
 
 ###
 
@@ -14,7 +14,7 @@ GET http://localhost:8020/rounds/worstHandPlayer/d00bca84-bf29-45da-9aff-f60df6d
 
 ###
 
-GET http://localhost:8020/rounds/handSummary/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
+GET http://localhost:8020/rounds/handResultsSummary/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
 
 ###
 
