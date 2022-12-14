@@ -11,7 +11,7 @@ export interface HandResult {
 }
 export interface RoundStatistics {
   userSummaries: UserSummary[]
-  deals?: DealSummary[]
+  deals: DealSummary[]
 }
 
 export interface UserSummary {
@@ -35,9 +35,8 @@ export interface HandSummary {
 }
 
 export interface DealSummary {
-  winningHands?: HandResult[]
-  winningPlayers?: Player[]
-  playerCards: PlayerCardsSummary
+  winningHands?: PlayerCardsSummary[]
+  playerCards: PlayerCardsSummary[]
   tableCards: Card[]
 }
 
