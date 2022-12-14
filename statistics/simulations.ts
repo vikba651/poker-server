@@ -1,8 +1,7 @@
-import { getHandQuality } from './poker-logic'
+import { getHandResult } from './poker-logic'
 import { cardStringToArray, generateDealGiven } from './card-generation'
 import { cardArrayToString, handQualityToString } from './to-strings'
-import { PlayerCardQualityType } from '../types/statistics'
-import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/session'
+import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import PlayerCardQuality from '../models/statistics'
 import { ranks, suitEmoji, suits } from './constant'
 
@@ -43,7 +42,7 @@ export async function simulatePlayerCards(playerCards: Card[], playerAmount: num
     let deal = generateDealGiven(playerCards, playerAmount)
     const givenHand = deal[0]
     let handQualities = deal.map((cards) => {
-      return getHandQuality(cards)
+      return getHandResult(cards)
     })
 
     handQualities.sort((a, b) => {

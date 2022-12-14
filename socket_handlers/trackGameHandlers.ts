@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io'
-import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/session'
+import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import { playerSockets, sessions } from './lobbyHandlers'
 import { RoundModel } from '../models/rounds'
 import { PlayerModel } from '../models/players'

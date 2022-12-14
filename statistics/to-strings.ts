@@ -1,4 +1,6 @@
-import { suitEmoji, suits, Card, HandQuality } from './constant'
+import { Card } from '../types/round'
+import { HandResult } from '../types/statistics'
+import { suitEmoji, suits } from './constant'
 
 export function cardArrayToString(cardArray: Card[]) {
   cardArray.forEach((card) => {
@@ -7,7 +9,7 @@ export function cardArrayToString(cardArray: Card[]) {
   console.log(' ')
 }
 
-export function handQualityToString(handQuality: HandQuality) {
+export function handQualityToString(handQuality: HandResult) {
   console.log(handQuality.hand)
   console.log(handQuality.score)
   process.stdout.write(`Best Cards: `)
