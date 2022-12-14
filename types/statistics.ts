@@ -18,8 +18,8 @@ export interface UserSummary {
   name: string
   handSummary: HandSummary
   qualities: number[]
-  worstDeal?: HandResult
-  bestDeal?: HandResult
+  worstDeal: HandResult
+  bestDeal: HandResult
 }
 
 export interface HandSummary {
@@ -34,13 +34,13 @@ export interface HandSummary {
   highCards: number
 }
 
-interface DealSummary {
-  winningHands: HandResult[]
-  winningPlayers: Player[]
+export interface DealSummary {
+  winningHands?: HandResult[]
+  winningPlayers?: Player[]
   playerCards: PlayerCardsSummary
   tableCards: Card[]
 }
 
-interface PlayerCardsSummary extends PlayerCards, HandResult {
-  handQuality: number
+export interface PlayerCardsSummary extends PlayerCards, HandResult {
+  handQuality?: number
 }

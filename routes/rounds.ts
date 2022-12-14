@@ -5,7 +5,14 @@ import PlayerCardQuality from '../models/statistics'
 import { getPlayerCardsKey } from '../statistics/simulations'
 import { table } from 'console'
 import { getHandResult } from '../statistics/poker-logic'
-import { HandResult, HandSummary, RoundStatistics, UserSummary } from '../types/statistics'
+import {
+  DealSummary,
+  HandResult,
+  HandSummary,
+  PlayerCardsSummary,
+  RoundStatistics,
+  UserSummary,
+} from '../types/statistics'
 import { hands } from '../statistics/constant'
 
 const router = Router()
@@ -91,6 +98,16 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
   const players = getPlayers(res)
   const playerHandQualitiesQuery = await queryPlayerHandQualities(res)
 
+  let emptyDeal: HandResult = {
+    hand: '',
+    quads: [],
+    triples: [],
+    pairs: [],
+    cards: [],
+    dealtCards: [],
+    score: 0,
+  }
+
   let userSummary: UserSummary = {
     name: '',
     handSummary: {
@@ -105,6 +122,8 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
       highCards: 0,
     },
     qualities: [],
+    worstDeal: emptyDeal,
+    bestDeal: emptyDeal,
   }
 
   let userSummaries: UserSummary[] = []
@@ -114,10 +133,51 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
       name: player,
       handSummary: getHandResultSummary(req, res, player),
       qualities: getPlayerCardQualities(res, playerHandQualitiesQuery, player),
-      // worstDeal: HandResult,
-      // bestDeal: HandResult,
+      worstDeal: getWorstHandResult(req, res, player),
+      bestDeal: getBestHandResult(req, res, player),
     }
+    // See if this modifies all user summaries so only last shows.
     userSummaries.push(userSummary)
+  })
+
+  let deals: DealSummary[] = []
+
+  res.round.deal.forEach((deal: Deal) => {
+    let playerCardSummary: PlayerCardsSummary = {
+      name: '',
+      cards: [],
+      hand: '',
+      quads: [],
+      triples: [],
+      pairs: [],
+      dealtCards: [],
+      score: 0,
+    }
+
+    deal.playerCards.forEach((playerCard: PlayerCards) => {
+      if (!!playerCard && playerCard.cards.length == 2 && deal.tableCards.length >= 3) {
+        const handResult = getHandResult(playerCard.cards.concat(deal.tableCards))
+
+        playerCardSummary = {
+          name: playerCard.name,
+          cards: playerCard.cards,
+          hand: handResult.hand,
+          quads: handResult.quads,
+          triples: handResult.triples,
+          pairs: handResult.pairs,
+          dealtCards: handResult.dealtCards,
+          score: handResult.score,
+        }
+        return playerCardSummary
+      }
+    })
+
+    let dealSummary: DealSummary = {
+      playerCards: playerCardSummary,
+      tableCards: deal.tableCards,
+    }
+
+    return
   })
 
   const roundStatistic: RoundStatistics = {
@@ -126,12 +186,12 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
   res.json(roundStatistic)
 })
 
-router.get('/bestHandPlayer/:id/:name', getRound, async (req: any, res: any) => {
+function getBestHandResult(req: any, res: any, player: string) {
   let handQualities: HandResult[] = []
 
   res.round.deals.forEach((deal: Deal) => {
     const playerCard = deal.playerCards.find((playerCards: any) => {
-      return playerCards.name == req.params.name
+      return playerCards.name == player
     })
     if (!!playerCard && playerCard.cards.length == 2 && deal.tableCards.length >= 3) {
       handQualities.push(getHandResult(playerCard.cards.concat(deal.tableCards)))
@@ -141,8 +201,45 @@ router.get('/bestHandPlayer/:id/:name', getRound, async (req: any, res: any) => 
     if (a.score > b.score) return a
     return b
   })
-  res.json(bestHandResult)
-})
+  return bestHandResult
+}
+
+function getWorstHandResult(req: any, res: any, player: string) {
+  let handQualities: HandResult[] = []
+
+  res.round.deals.forEach((deal: Deal) => {
+    const playerCard = deal.playerCards.find((playerCards: any) => {
+      return playerCards.name == player
+    })
+    if (!!playerCard && playerCard.cards.length == 2 && deal.tableCards.length >= 3) {
+      handQualities.push(getHandResult(playerCard.cards.concat(deal.tableCards)))
+    }
+  })
+  let bestHandResult = handQualities.reduce(function (a, b) {
+    if (a.score < b.score) return a
+    return b
+  })
+  return bestHandResult
+}
+
+// router.get('/bestHandPlayer/:id/', getRound, async (req: any, res: any) => {
+//   let handQualities: HandResult[] = []
+
+//   res.round.deals.forEach((deal: Deal) => {
+//     const playerCard = deal.playerCards.find((playerCards: any) => {
+//       return playerCards.name == player
+//     })
+//     if (!!playerCard && playerCard.cards.length == 2 && deal.tableCards.length >= 3) {
+//       handQualities.push(getHandResult(playerCard.cards.concat(deal.tableCards)))
+//     }
+//   })
+//   let bestHandResult = handQualities.reduce(function (a, b) {
+//     if (a.score > b.score) return a
+//     return b
+//   })
+//   return bestHandResult
+//   res.json(getBestHand(req: any, res: any, ))
+// })
 
 router.get('/worstHandPlayer/:id/:name', getRound, async (req: any, res: any) => {
   let handQualities: HandResult[] = []

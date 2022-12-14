@@ -6,7 +6,7 @@ GET http://localhost:8020/rounds/roundSummary/d00bca84-bf29-45da-9aff-f60df6d6b5
 
 ###
 
-GET http://localhost:8020/rounds/bestHandPlayer/d00bca84-bf29-45da-9aff-f60df6d6b5f3
+GET http://localhost:8020/rounds/bestHandPlayer/d00bca84-bf29-45da-9aff-f60df6d6b5f3/Martin
 
 ###
 
