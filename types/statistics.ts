@@ -35,11 +35,12 @@ export interface HandSummary {
 }
 
 export interface DealSummary {
-  winningHands?: PlayerCardsSummary[]
+  winningHands: PlayerCardsSummary[]
   playerCards: PlayerCardsSummary[]
   tableCards: Card[]
 }
 
 export interface PlayerCardsSummary extends PlayerCards, HandResult {
+  cards: Card[]
   handQuality?: number
 }

@@ -3,7 +3,6 @@ import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import { RoundModel } from '../models/rounds'
 import PlayerCardQuality from '../models/statistics'
 import { getPlayerCardsKey } from '../statistics/simulations'
-import { table } from 'console'
 import { getHandResult } from '../statistics/poker-logic'
 import {
   DealSummary,
@@ -117,29 +116,18 @@ function getPlayerCardQualities(res: any, playerHandQualitiesQuery: any, player:
   return playerCardQualities
 }
 
-function getBestHandResultDeal(dealSummary: DealSummary) {
-  const bestHandResult = dealSummary.playerCards.reduce((a, b) => {
-    if (a.score > b.score) return a
-    return b
-  })
-  const bestHands = dealSummary.playerCards.find((playerCardsSummary: PlayerCardsSummary) => {
-    playerCardsSummary.score === bestHandResult.score
-  })
-  return bestHands
-}
-
-function getBestPlayerDeal(dealSummary: DealSummary) {
-  // todo use DealSummary object to get this
-  let handResults: HandResult[] = []
-
-  const bestHandResult = dealSummary.playerCards.reduce((a, b) => {
-    if (a.score > b.score) return a
-    return b
-  })
-
-  const bestHandResults = dealSummary.playerCards.find((playerCardsSummary: PlayerCardsSummary) => {
-    playerCardsSummary.score === bestHandResult.score
-  })
+function getBestHandResultDeal(playerCardsSummaries: PlayerCardsSummary[]) {
+  if (playerCardsSummaries.length) {
+    const bestHandResult = playerCardsSummaries.reduce((a, b) => {
+      if (a.score > b.score) return a
+      return b
+    })
+    const bestHands = playerCardsSummaries.filter((playerCardsSummary: PlayerCardsSummary) => {
+      return playerCardsSummary.score === bestHandResult.score
+    })
+    return bestHands
+  }
+  return playerCardsSummaries //bestHands
 }
 
 function getBestHandResultPlayer(req: any, res: any, player: string) {
@@ -198,31 +186,47 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
         console.log(`Missing simulations for ${getPlayerCardsKey(playerCards.cards)}`)
       }
 
-      if (!!playerCards && playerCards.cards.length == 2 && deal.tableCards.length >= 3) {
-        const handResult = getHandResult(playerCards.cards.concat(deal.tableCards))
+      if (!!playerCards && playerCards.cards.length == 2) {
+        if (deal.tableCards.length >= 3) {
+          const handResult = getHandResult(playerCards.cards.concat(deal.tableCards))
 
-        const playerCardSummary = {
-          name: playerCards.name,
-          cards: playerCards.cards,
-          hand: handResult.hand,
-          quads: handResult.quads,
-          triples: handResult.triples,
-          pairs: handResult.pairs,
-          dealtCards: handResult.dealtCards,
-          score: handResult.score,
-          handQuality: handQuality,
+          const playerCardsSummary: PlayerCardsSummary = {
+            name: playerCards.name,
+            cards: playerCards.cards,
+            hand: handResult.hand,
+            quads: handResult.quads,
+            triples: handResult.triples,
+            pairs: handResult.pairs,
+            dealtCards: handResult.dealtCards,
+            score: handResult.score,
+            handQuality: handQuality,
+          }
+          playerCardsSummaries.push(playerCardsSummary)
+        } else {
+          const playerCardsSummary: PlayerCardsSummary = {
+            name: playerCards.name,
+            cards: playerCards.cards,
+            hand: '',
+            quads: [],
+            triples: [],
+            pairs: [],
+            dealtCards: [],
+            score: 0,
+            handQuality: handQuality,
+          }
+          playerCardsSummaries.push(playerCardsSummary)
         }
-        playerCardsSummaries.push(playerCardSummary)
       }
     })
+    if (playerCardsSummaries.length) {
+      const dealSummary: DealSummary = {
+        winningHands: getBestHandResultDeal(playerCardsSummaries),
+        playerCards: playerCardsSummaries,
+        tableCards: deal.tableCards,
+      }
 
-    let dealSummary: DealSummary = {
-      //winningHands: getBestHandResultDeal(dealSummary),
-      playerCards: playerCardsSummaries,
-      tableCards: deal.tableCards,
+      deals.push(dealSummary)
     }
-
-    deals.push(dealSummary)
   })
   return deals
 }
