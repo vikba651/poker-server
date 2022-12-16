@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import { RoundModel } from '../models/rounds'
-import PlayerCardQuality from '../models/statistics'
+import PlayerCardQualityModel from '../models/statistics'
 import { getPlayerCardsKey } from '../statistics/simulations'
 import { getHandResult } from '../statistics/poker-logic'
 import {
@@ -77,7 +77,7 @@ async function queryPlayerHandQualities(res: any) {
   let playerHandQualitiesQuery: any = null
 
   try {
-    playerHandQualitiesQuery = await PlayerCardQuality.find({
+    playerHandQualitiesQuery = await PlayerCardQualityModel.find({
       cardsKey: {
         $in: playerCardKeys,
       },

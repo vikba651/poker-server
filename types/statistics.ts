@@ -44,3 +44,11 @@ export interface PlayerCardsSummary extends PlayerCards, HandResult {
   cards: Card[]
   handQuality?: number
 }
+
+export interface PlayerCardQuality {
+  winRate: number
+  percentile?: number
+  cardsKey: string
+  playerAmount: number
+  iterations: number
+}

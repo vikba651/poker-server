@@ -47,6 +47,9 @@ mongoose.connect(`${process.env.DATABASE_URL}`, (error) => {
     console.log('Could not connect to Mongoose')
   } else {
     console.log('Connected to Mongoose')
+    // for (let i = 1; i < 8; i++) {
+    //   simulateAllPlayerCards(i, 10000)
+    // }
   }
 })
 

@@ -2,8 +2,10 @@ import { getHandResult } from './poker-logic'
 import { cardStringToArray, generateDealGiven } from './card-generation'
 import { cardArrayToString, handQualityToString } from './to-strings'
 import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
-import PlayerCardQuality from '../models/statistics'
+import { PlayerCardQuality } from '../types/statistics'
+import PlayerCardQualitySchema from '../models/statistics'
 import { ranks, suitEmoji, suits } from './constant'
+import mongoose from 'mongoose'
 
 export function getPlayerCardsKey(playerCards: Card[]): string {
   let highCard =
@@ -16,11 +18,17 @@ export function getPlayerCardsKey(playerCards: Card[]): string {
 }
 
 export async function simulateAllPlayerCards(playerAmount: number, iterations: number) {
-  console.log('Lets simulate some')
+  console.log('Simulation started')
+
+  let playerCardQualities: PlayerCardQuality[] = []
+
   ranks.forEach((firstRank) => {
     ranks.forEach((secondRank) => {
       if (ranks.indexOf(firstRank) <= ranks.indexOf(secondRank)) {
-        simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}C`), playerAmount, iterations)
+        console.log(`${playerCardQualities.length + 1} / 169`)
+        playerCardQualities.push(
+          simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}C`), playerAmount, iterations)
+        )
       }
     })
   })
@@ -28,13 +36,38 @@ export async function simulateAllPlayerCards(playerAmount: number, iterations: n
   ranks.forEach((firstRank) => {
     ranks.forEach((secondRank) => {
       if (ranks.indexOf(firstRank) < ranks.indexOf(secondRank)) {
-        simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}H`), playerAmount, iterations)
+        console.log(`${playerCardQualities.length + 1} / 169`)
+        playerCardQualities.push(
+          simulatePlayerCards(cardStringToArray(`${firstRank}H ${secondRank}H`), playerAmount, iterations)
+        )
       }
     })
   })
+
+  playerCardQualities = playerCardQualities.sort((a, b) => {
+    return a.winRate - b.winRate
+  })
+
+  for (let i = 0; i < playerCardQualities.length; i++) {
+    if (i) {
+      playerCardQualities[i].percentile = Math.round((100 * (i + 1)) / playerCardQualities.length)
+    } else {
+      playerCardQualities[i].percentile = 0
+    }
+  }
+
+  PlayerCardQualitySchema.insertMany(playerCardQualities)
+    .then(() => {
+      console.log('Simulations added to the database')
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+
+  return playerCardQualities
 }
 
-export async function simulatePlayerCards(playerCards: Card[], playerAmount: number, iterations: number) {
+export function simulatePlayerCards(playerCards: Card[], playerAmount: number, iterations: number) {
   let time = Date.now()
   let wins = 0
 
@@ -64,24 +97,30 @@ export async function simulatePlayerCards(playerCards: Card[], playerAmount: num
   }
   const cardsKey = getPlayerCardsKey(playerCards)
 
-  let playerCardQuality = await PlayerCardQuality.findOne({ cardsKey, playerAmount })
+  // let playerCardQuality = await PlayerCardQuality.findOne({ cardsKey, playerAmount })
 
-  playerCardQuality = !!playerCardQuality
-    ? playerCardQuality
-    : new PlayerCardQuality({
-        winRate: wins / iterations,
-        cardsKey,
-        playerAmount,
-        iterations,
-      })
+  // playerCardQuality = !!playerCardQuality
+  //   ? playerCardQuality
+  //   : new PlayerCardQuality({
+  //       winRate: wins / iterations,
+  //       cardsKey,
+  //       playerAmount,
+  //       iterations,
+  //     })
 
-  const newWinRate = wins / iterations
-  playerCardQuality.winRate =
-    (playerCardQuality.winRate * playerCardQuality.iterations + newWinRate * iterations) /
-    (iterations + playerCardQuality.iterations)
-  playerCardQuality.iterations += iterations
+  let playerCardQuality: PlayerCardQuality = {
+    winRate: wins / iterations,
+    cardsKey,
+    playerAmount,
+    iterations,
+  }
 
-  const newPlayerCardQuality = await playerCardQuality.save()
+  // const newWinRate = wins / iterations
+  // playerCardQuality.winRate =
+  //   (playerCardQuality.winRate * playerCardQuality.iterations + newWinRate * iterations) /
+  //   (iterations + playerCardQuality.iterations)
+  // playerCardQuality.iterations += iterations
+
   console.log(
     `Completed in ${Date.now() - time} ms. ${playerCards[1].rank}${suitEmoji[suits.indexOf(playerCards[1].suit)]} ${
       playerCards[0].rank
@@ -89,4 +128,6 @@ export async function simulatePlayerCards(playerCards: Card[], playerAmount: num
       playerCardQuality.iterations
     }, Win Rate: ${playerCardQuality.winRate}`
   )
+
+  return playerCardQuality
 }
