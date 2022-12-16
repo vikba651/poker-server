@@ -35,6 +35,7 @@ export interface HandSummary {
 }
 
 export interface DealSummary {
+  id: number
   winningHands: PlayerCardsSummary[]
   playerCards: PlayerCardsSummary[]
   tableCards: Card[]
