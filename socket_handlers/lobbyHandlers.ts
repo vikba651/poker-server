@@ -15,18 +15,13 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
       socket: ws,
       player: player,
     })
-    const firstDeal = {
-      id: 1,
-      playerCards: [],
-      tableCards: [],
-    }
 
     const session: Session = {
       id: uuidv4(),
       code: createCode(),
       creator: data.name,
       players: [player],
-      deals: [firstDeal],
+      deals: [],
       startTime: Date.now(),
     }
     sessions.push(session)

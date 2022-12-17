@@ -246,7 +246,6 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
     })
     if (playerCardsSummaries.length) {
       const dealSummary: DealSummary = {
-        id: deal.id,
         winningHands: getBestHandResultDeal(playerCardsSummaries),
         playerCards: playerCardsSummaries,
         tableCards: deal.tableCards,
@@ -391,7 +390,6 @@ async function getRound(req: any, res: any, next: any) {
     const filteredTableCards: Card[] = filterEmptyCards(deal.tableCards)
 
     const filteredDeal: Deal = {
-      id: deal.id,
       playerCards: filteredPlayerCards,
       tableCards: filteredTableCards,
     }

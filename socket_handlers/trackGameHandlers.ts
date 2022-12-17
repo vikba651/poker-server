@@ -5,63 +5,33 @@ import { RoundModel } from '../models/rounds'
 import { PlayerModel } from '../models/players'
 
 export function registerTrackGameHandlers(wss: Server, ws: Socket) {
-  const newDeal = (data: { sessionId: string; cards: Card[]; deal: number }) => {
-    const player = playerSockets.find((player) => player.socket === ws)?.player
-    const session = sessions.find((session) => session.id === data.sessionId)
-    if (player && session) {
-      const playerCards: PlayerCards = {
-        name: player.name,
-        cards: data.cards,
-      }
-      let currentDeal = session.deals.find((deal) => deal.id === data.deal)
-      if (currentDeal) {
-        currentDeal.playerCards.push(playerCards)
-      } else {
-        console.error(`Deal ${data.deal} does not exist?`)
-      }
-      const nextDeal = session.deals.find((deal) => deal.id === data.deal + 1)
-      if (nextDeal) {
-        ws.emit('tableCardsUpdated', nextDeal.tableCards, data.deal + 1)
-      } else {
-        const newDeal: Deal = {
-          id: data.deal + 1,
-          playerCards: [],
-          tableCards: [],
-        }
-        session.deals.push(newDeal)
-      }
-    }
-  }
-
   const updateTableCards = (data: { cards: Card[]; sessionId: string; deal: number }) => {
     // Add tablecards to session
     const session = sessions.find((session) => session.id === data.sessionId)
     if (session) {
-      let currentDeal = session.deals.find((deal) => deal.id === data.deal)
-      if (currentDeal) {
-        currentDeal.tableCards = data.cards
-      } else {
-        console.error(`Deal ${data.deal} has not been created`)
-      }
       ws.to(data.sessionId).emit('tableCardsUpdated', data.cards, data.deal)
     } else {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
     }
   }
 
-  const endGame = (data: { cards: Card[]; sessionId: string; currentDeal: number }, callback: any) => {
+  const endGame = (data: { deals: Card[][]; sessionId: string; currentDeal: number }, callback: any) => {
     const session = sessions.find((session) => session.id === data.sessionId)
     const player = playerSockets.find((player) => player.socket === ws)?.player
     if (player && session) {
-      let currentDeal = session.deals.find((deal) => deal.id === data.currentDeal)
-      if (data.cards && currentDeal) {
-        const playerCards: PlayerCards = {
-          name: player.name,
-          cards: data.cards,
+      for (let i = 0; i < data.deals.length; i++) {
+        if (!data.deals[i].slice(0, 2).every((card) => card.rank && card.suit)) break
+        const playerCards: PlayerCards = { name: player.name, cards: data.deals[i].slice(0, 2) }
+        if (i >= session.deals.length) {
+          const newDeal: Deal = {
+            playerCards: [playerCards],
+            tableCards: data.deals[i].slice(2),
+          }
+          session.deals.push(newDeal)
+        } else {
+          session.deals[i].playerCards.push(playerCards)
+          session.deals[i].tableCards = data.deals[i].slice(2)
         }
-        currentDeal.playerCards.push(playerCards)
-      } else {
-        console.error(`Deal ${data.currentDeal} has not been created`)
       }
       const round: Round = {
         _id: session.id,
@@ -69,14 +39,14 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
         startTime: session.startTime,
       }
       postRound(round, player)
-      callback(round)
+      ws.to(session.id).emit('endGame', round)
+      // callback(round)
     } else {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
     }
   }
 
   ws.on('updateTableCards', updateTableCards)
-  ws.on('newDeal', newDeal)
   ws.on('endGame', endGame)
 }
 
