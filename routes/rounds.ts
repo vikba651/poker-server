@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import { RoundModel } from '../models/rounds'
+import { PlayerModel } from '../models/players'
 import PlayerCardQualityModel from '../models/statistics'
 import { getPlayerCardsKey } from '../statistics/simulations'
 import { getHandResult } from '../statistics/poker-logic'
@@ -364,12 +365,49 @@ router.get('/:id', getRound, async (req: any, res: any) => {
 // })
 
 // Delete one round
-router.delete('/:id', getRound, async (req: any, res: any) => {
-  try {
-    await res.round.remove()
-    res.json({ message: 'Deleted round' })
-  } catch (e: any) {
-    res.status(500).json({ message: e.message })
+router.delete('/:id/:player', getRound, async (req: any, res: any) => {
+  const players = getPlayers(res)
+
+  const playerModels = await PlayerModel.find({
+    name: {
+      $in: players,
+    },
+  })
+
+  let playerModel = playerModels.find((playerModel) => {
+    return playerModel.name == req.params.player
+  })
+  console.log(playerModel)
+
+  if (!playerModel) {
+    return res.status(500).json({ message: 'Cannot find player' })
+  }
+
+  playerModel.roundIds = playerModel.roundIds.filter((roundId) => {
+    return roundId !== req.params.id
+  })
+  await playerModel.save()
+
+  let existsInPlayers = false
+  playerModels.forEach((playerModel) => {
+    playerModel.roundIds.forEach((roundId) => {
+      if (roundId === req.params.id) {
+        existsInPlayers = true
+      }
+    })
+  })
+
+  if (!existsInPlayers) {
+    try {
+      console.log(playerModels)
+
+      await RoundModel.deleteOne({ _id: req.params.id })
+      res.json({ message: 'Deleted round' })
+    } catch (e: any) {
+      res.status(500).json({ message: e.message })
+    }
+  } else {
+    res.json({ message: `Round deleted for player ${req.params.player}` })
   }
 })
 
@@ -397,7 +435,7 @@ async function getRound(req: any, res: any, next: any) {
     }
     return filteredDeal
   })
-  res.round = { id: round.id, deals, startTime: round.startTime }
+  res.round = { ...round, deals }
   next()
 }
 
