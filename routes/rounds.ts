@@ -110,7 +110,7 @@ function getPlayerCardQualities(res: any, playerHandQualitiesQuery: any, player:
         )
       })
       if (!!playerCardQuality) {
-        playerCardQualities.push(playerCardQuality.winRate)
+        playerCardQualities.push(playerCardQuality.percentile)
       } else {
         console.log(`Missing simulations for ${getPlayerCardsKey(playerCards.cards)}`)
       }
@@ -201,7 +201,8 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
 
     deal.playerCards.forEach((playerCards: PlayerCards) => {
       if (!!playerCards && playerCards.cards.length == 2) {
-        let handQuality: number = 0
+        let winRate = 0
+        let percentile = 0
         const playerCardQuality = playerHandQualitiesQuery.find((queryElement: any) => {
           return (
             queryElement.cardsKey == getPlayerCardsKey(playerCards.cards) &&
@@ -209,7 +210,8 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
           )
         })
         if (!!playerCardQuality) {
-          handQuality = playerCardQuality.winRate
+          winRate = playerCardQuality.winRate
+          percentile = playerCardQuality.percentile
         } else {
           console.log(`Missing simulations for ${getPlayerCardsKey(playerCards.cards)}`)
         }
@@ -226,7 +228,8 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
             pairs: handResult.pairs,
             dealtCards: handResult.dealtCards,
             score: handResult.score,
-            handQuality: handQuality,
+            winRate: winRate,
+            percentile: percentile,
           }
           playerCardsSummaries.push(playerCardsSummary)
         } else {
@@ -240,7 +243,8 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
             pairs: [],
             dealtCards: [],
             score: 0,
-            handQuality: handQuality,
+            winRate: 0,
+            percentile: 0,
           }
           playerCardsSummaries.push(playerCardsSummary)
         }

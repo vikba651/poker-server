@@ -41,12 +41,13 @@ export interface DealSummary {
 }
 
 export interface PlayerCardsSummary extends PlayerCards, HandResult {
-  handQuality: number
+  winRate: number
+  percentile: number
 }
 
 export interface PlayerCardQuality {
   winRate: number
-  percentile?: number
+  percentile: number
   cardsKey: string
   playerAmount: number
   iterations: number
