@@ -29,7 +29,12 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
           }
           session.deals.push(newDeal)
         } else {
-          session.deals[i].playerCards.push(playerCards)
+          let index = session.deals[i].playerCards.findIndex((playerCards) => playerCards.name === player.name)
+          if (index > -1) {
+            session.deals[i].playerCards[index] = playerCards
+          } else {
+            session.deals[i].playerCards.push(playerCards)
+          }
           session.deals[i].tableCards = data.deals[i].slice(2)
         }
       }
@@ -39,8 +44,8 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
         startTime: session.startTime,
       }
       postRound(round, player)
-      ws.to(session.id).emit('endGame', round)
-      // callback(round)
+      callback(round)
+      ws.to(session.id).emit('playerEndedGame', round)
     } else {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
     }
