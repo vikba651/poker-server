@@ -5,7 +5,7 @@ export interface HandResult {
   quads: Card[][]
   triples: Card[][]
   pairs: Card[][]
-  cards: Card[]
+  bestCards: Card[]
   dealtCards: Card[]
   score: number
 }
@@ -42,8 +42,7 @@ export interface DealSummary {
 }
 
 export interface PlayerCardsSummary extends PlayerCards, HandResult {
-  cards: Card[]
-  handQuality?: number
+  handQuality: number
 }
 
 export interface PlayerCardQuality {

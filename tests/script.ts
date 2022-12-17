@@ -1,24 +1,74 @@
 import mongoose from 'mongoose'
 import { cardStringToArray } from '../statistics/card-generation'
 import { simulateAllPlayerCards, simulatePlayerCards } from '../statistics/simulations'
+import { getHandResult } from '../statistics/poker-logic'
 
-mongoose.connect(`${process.env.DATABASE_URL}`, (error) => {
-  if (error) {
-    console.log('Could not connect to Mongoose')
-  } else {
-    console.log('Connected to Mongoose')
-  }
-})
+let handResult = getHandResult([
+  {
+    suit: 'heart',
+    rank: '2',
+  },
+  {
+    suit: 'spade',
+    rank: '2',
+  },
+  {
+    suit: 'spade',
+    rank: '3',
+  },
+  {
+    suit: 'diamond',
+    rank: '3',
+  },
+  {
+    suit: 'heart',
+    rank: '3',
+  },
+  {
+    suit: 'heart',
+    rank: '4',
+  },
+  {
+    suit: 'diamond',
+    rank: '4',
+  },
+])
 
-mongoose.connect(`${process.env.DATABASE_URL}`, async (error: any) => {
-  if (error) {
-    console.log('Could not connect to Mongoose')
-  } else {
-    console.log('Connected to Mongoose')
-    const playerCardQualities = await simulateAllPlayerCards(4, 100)
+handResult = getHandResult([
+  {
+    suit: 'H',
+    rank: '2',
+  },
+  {
+    suit: 'S',
+    rank: '2',
+  },
+  {
+    suit: 'S',
+    rank: '3',
+  },
+  {
+    suit: 'D',
+    rank: '3',
+  },
+  {
+    suit: 'H',
+    rank: '3',
+  },
+  {
+    suit: 'H',
+    rank: '4',
+  },
+  {
+    suit: 'D',
+    rank: '4',
+  },
+])
 
-    playerCardQualities.forEach((playerCardQuality) => {
-      console.log(playerCardQuality.cardsKey, playerCardQuality.percentile, playerCardQuality.winRate)
-    })
-  }
-})
+console.log(handResult)
+
+// const playerCardQualities = simulateAllPlayerCards(4, 100)
+
+// playerCardQualities.forEach((playerCardQuality) => {
+//   console.log(playerCardQuality.cardsKey, playerCardQuality.percentile, playerCardQuality.winRate)
+// })

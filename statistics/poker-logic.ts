@@ -79,14 +79,15 @@ function filterSets(cardArray: Card[], sets: Card[][]): Card[] {
 }
 
 export function getHandResult(cardArray: Card[]): HandResult {
+  const originalCardArray = [...cardArray]
   const rankGroups = groupBy(cardArray, 'rank')
   let handQuality: HandResult = {
     hand: '',
     quads: [],
     triples: [],
     pairs: [],
-    cards: [],
-    dealtCards: cardArray,
+    bestCards: [],
+    dealtCards: originalCardArray,
     score: 0,
   }
 
@@ -123,7 +124,7 @@ export function getHandResult(cardArray: Card[]): HandResult {
   } else if (handQuality.quads.length) {
     handQuality.hand = 'Four of a kind'
     cardArray = [...filterSets(cardArray, handQuality.quads).slice(-1), ...handQuality.quads.slice(-1)[0]]
-  } else if (handQuality.triples.length & handQuality.pairs.length) {
+  } else if (handQuality.triples.length && handQuality.pairs.length) {
     handQuality.hand = 'Full house'
     cardArray = [...handQuality.pairs.slice(-1)[0], ...handQuality.triples.slice(-1)[0]]
   } else if (flush(cardArray, false).length) {
@@ -149,8 +150,8 @@ export function getHandResult(cardArray: Card[]): HandResult {
     handQuality.hand = 'High card'
   }
 
-  handQuality.cards = cardArray.slice(-5)
-  handQuality.score = getScore(handQuality.cards, handQuality.hand)
+  handQuality.bestCards = cardArray.slice(-5)
+  handQuality.score = getScore(handQuality.bestCards, handQuality.hand)
 
   return handQuality
 }

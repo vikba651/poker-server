@@ -13,7 +13,7 @@ export function handQualityToString(handQuality: HandResult) {
   console.log(handQuality.hand)
   console.log(handQuality.score)
   process.stdout.write(`Best Cards: `)
-  cardArrayToString(handQuality.cards)
+  cardArrayToString(handQuality.bestCards)
   process.stdout.write(`Dealt Cards: `)
   cardArrayToString(handQuality.dealtCards)
   function printSets(cards: Card[]) {

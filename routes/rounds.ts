@@ -34,7 +34,6 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
       name: player,
       handSummary: getHandResultSummary(req, res, player),
       qualities: getPlayerCardQualities(res, playerHandQualitiesQuery, player),
-      //Rename to getWorstHandResultPlayer
       worstDeal: getWorstHandResultPlayer(req, res, player),
       bestDeal: getBestHandResultPlayer(req, res, player),
     }
@@ -156,7 +155,7 @@ function getBestHandResultPlayer(req: any, res: any, player: string) {
     quads: [],
     triples: [],
     pairs: [],
-    cards: [],
+    bestCards: [],
     dealtCards: [],
     score: 0,
   }
@@ -186,7 +185,7 @@ function getWorstHandResultPlayer(req: any, res: any, player: string): HandResul
     quads: [],
     triples: [],
     pairs: [],
-    cards: [],
+    bestCards: [],
     dealtCards: [],
     score: 0,
   }
@@ -219,6 +218,7 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
           const playerCardsSummary: PlayerCardsSummary = {
             name: playerCards.name,
             cards: playerCards.cards,
+            bestCards: handResult.bestCards,
             hand: handResult.hand,
             quads: handResult.quads,
             triples: handResult.triples,
@@ -232,6 +232,7 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
           const playerCardsSummary: PlayerCardsSummary = {
             name: playerCards.name,
             cards: playerCards.cards,
+            bestCards: [],
             hand: '',
             quads: [],
             triples: [],
