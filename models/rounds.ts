@@ -11,7 +11,6 @@ const PlayerCardsSchema = new Schema({
 })
 
 const DealSchema = new Schema({
-  id: Number,
   playerCards: [PlayerCardsSchema],
   tableCards: [CardSchema],
 })

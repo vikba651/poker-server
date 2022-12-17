@@ -35,7 +35,6 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
       name: player,
       handSummary: getHandResultSummary(req, res, player),
       qualities: getPlayerCardQualities(res, playerHandQualitiesQuery, player),
-      //Rename to getWorstHandResultPlayer
       worstDeal: getWorstHandResultPlayer(req, res, player),
       bestDeal: getBestHandResultPlayer(req, res, player),
     }
@@ -157,7 +156,7 @@ function getBestHandResultPlayer(req: any, res: any, player: string) {
     quads: [],
     triples: [],
     pairs: [],
-    cards: [],
+    bestCards: [],
     dealtCards: [],
     score: 0,
   }
@@ -187,7 +186,7 @@ function getWorstHandResultPlayer(req: any, res: any, player: string): HandResul
     quads: [],
     triples: [],
     pairs: [],
-    cards: [],
+    bestCards: [],
     dealtCards: [],
     score: 0,
   }
@@ -220,6 +219,7 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
           const playerCardsSummary: PlayerCardsSummary = {
             name: playerCards.name,
             cards: playerCards.cards,
+            bestCards: handResult.bestCards,
             hand: handResult.hand,
             quads: handResult.quads,
             triples: handResult.triples,
@@ -233,6 +233,7 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
           const playerCardsSummary: PlayerCardsSummary = {
             name: playerCards.name,
             cards: playerCards.cards,
+            bestCards: [],
             hand: '',
             quads: [],
             triples: [],
@@ -247,7 +248,6 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
     })
     if (playerCardsSummaries.length) {
       const dealSummary: DealSummary = {
-        id: deal.id,
         winningHands: getBestHandResultDeal(playerCardsSummaries),
         playerCards: playerCardsSummaries,
         tableCards: deal.tableCards,
@@ -429,7 +429,6 @@ async function getRound(req: any, res: any, next: any) {
     const filteredTableCards: Card[] = filterEmptyCards(deal.tableCards)
 
     const filteredDeal: Deal = {
-      id: deal.id,
       playerCards: filteredPlayerCards,
       tableCards: filteredTableCards,
     }

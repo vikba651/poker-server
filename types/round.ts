@@ -25,7 +25,6 @@ export interface PlayerSocket {
 }
 
 export interface Deal {
-  id: number
   playerCards: PlayerCards[]
   tableCards: Card[]
 }
