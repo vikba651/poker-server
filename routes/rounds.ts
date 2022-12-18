@@ -110,7 +110,7 @@ function getPlayerCardQualities(res: any, playerHandQualitiesQuery: any, player:
         )
       })
       if (!!playerCardQuality) {
-        playerCardQualities.push(playerCardQuality.percentile)
+        playerCardQualities.push(playerCardQuality.winRate)
       } else {
         console.log(`Missing simulations for ${getPlayerCardsKey(playerCards.cards)}`)
       }

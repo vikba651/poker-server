@@ -110,6 +110,7 @@ export function simulatePlayerCards(playerCards: Card[], playerAmount: number, i
 
   let playerCardQuality: PlayerCardQuality = {
     winRate: wins / iterations,
+    percentile: 0,
     cardsKey,
     playerAmount,
     iterations,
