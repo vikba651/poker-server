@@ -54,9 +54,20 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     ws.to(sessionId).emit('trackingStarted')
   }
 
+  const rejoinSession = (data: { name: string; sessionId: string }) => {
+    ws.join(data.sessionId)
+    let playerSocket = playerSockets.find((playerSocket) => playerSocket.player.name === data.name)
+    if (playerSocket) {
+      playerSocket.socket = ws
+    } else {
+      ws.send('Rejoin session failed')
+    }
+  }
+
   ws.on('createSession', createSession)
   ws.on('joinSession', joinSession)
   ws.on('startTracking', startTracking)
+  ws.on('rejoinSession', rejoinSession)
 }
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

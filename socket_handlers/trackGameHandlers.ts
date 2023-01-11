@@ -47,7 +47,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
       callback(round)
       ws.to(session.id).emit('playerEndedGame', round)
     } else {
-      ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
+      ws.send('Save round failed')
     }
   }
 
