@@ -6,13 +6,45 @@ import { PlayerModel } from '../models/players'
 
 export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   const updateTableCards = (data: { cards: Card[]; sessionId: string; deal: number }) => {
-    // Add tablecards to session
     const session = sessions.find((session) => session.id === data.sessionId)
-    if (session) {
-      ws.to(data.sessionId).emit('tableCardsUpdated', data.cards, data.deal)
-    } else {
+    if (!session) {
       ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
+      return
     }
+    // ws.to(data.sessionId).emit('tableCardsUpdated', data.cards, data.deal)
+    let newDeals = [...session.deals]
+    while (!newDeals[data.deal]) {
+      const emptyDeal = {
+        playerCards: [],
+        tableCards: [
+          { suit: '', rank: '' },
+          { suit: '', rank: '' },
+          { suit: '', rank: '' },
+          { suit: '', rank: '' },
+          { suit: '', rank: '' },
+        ],
+      }
+      newDeals.push(emptyDeal)
+    }
+    const newDeal = {
+      playerCards: [],
+      tableCards: data.cards,
+    }
+    newDeals[data.deal] = newDeal
+    session.deals = newDeals
+    ws.to(data.sessionId).emit('tableCardsUpdated', session.deals[data.deal].tableCards, data.deal)
+  }
+
+  const updateTableCardsOnRejoin = (data: { sessionId: string }, callback: any) => {
+    const session = sessions.find((session) => session.id === data.sessionId)
+    if (!session) {
+      ws.to(data.sessionId).emit('message', `No session with id=${data.sessionId} found`)
+      return
+    }
+    const dealsTableCards = session!.deals.map((deal) => {
+      return deal.tableCards
+    })
+    callback(dealsTableCards)
   }
 
   const endGame = (data: { deals: Card[][]; sessionId: string; currentDeal: number }, callback: any) => {
@@ -52,6 +84,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
   }
 
   ws.on('updateTableCards', updateTableCards)
+  ws.on('updateTableCardsOnRejoin', updateTableCardsOnRejoin)
   ws.on('endGame', endGame)
 }
 
