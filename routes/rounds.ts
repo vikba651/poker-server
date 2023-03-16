@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import { RoundModel } from '../models/rounds'
 import { PlayerModel } from '../models/players'
-import PlayerCardQualityModel from '../models/statistics'
+import { PlayerCardQualityModel } from '../models/statistics'
 import { getPlayerCardsKey } from '../statistics/simulations'
 import { getHandResult } from '../statistics/poker-logic'
 import {
