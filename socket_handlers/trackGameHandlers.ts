@@ -74,6 +74,7 @@ export function registerTrackGameHandlers(wss: Server, ws: Socket) {
         _id: session.id,
         deals: session.deals,
         startTime: session.startTime,
+        earnings: [],
       }
       postRound(round, player)
       callback(round)

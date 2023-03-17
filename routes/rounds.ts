@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
+import { Card, Deal, Player, PlayerCards, PlayerEarning, Round, Session } from '../types/round'
 import { RoundModel } from '../models/rounds'
 import { PlayerModel } from '../models/players'
 import { PlayerCardQualityModel } from '../models/statistics'
@@ -415,6 +415,26 @@ router.delete('/:id/:player', getRound, async (req: any, res: any) => {
   }
 })
 
+router.post('/roundEarnings/:id/', getRound, async (req: any, res: any) => {
+  const players = getPlayers(res)
+  let round
+  try {
+    round = await RoundModel.findById(req.params.id)
+    if (round == null) {
+      return res.status(404).json({ message: 'Cannot find round' })
+    }
+  } catch (e: any) {
+    return res.status(500).json({ message: e.message })
+  }
+  round.earnings = req.body.earnings
+  try {
+    const updatedRound = await round.save()
+    res.json(round)
+  } catch (e: any) {
+    res.status(400).json({ message: e.message })
+  }
+})
+
 async function getRound(req: any, res: any, next: any) {
   let round
   try {
@@ -426,6 +446,7 @@ async function getRound(req: any, res: any, next: any) {
     return res.status(500).json({ message: e.message })
   }
 
+  // TODO encapsulate the deals cleaning as a middleware function
   const deals: Deal[] = round.deals.map((deal) => {
     const filteredPlayerCards = deal.playerCards.map((playerCards) => {
       return { name: playerCards.name ? playerCards.name : '', cards: filterEmptyCards(playerCards.cards) }

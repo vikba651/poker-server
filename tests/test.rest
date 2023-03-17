@@ -6,10 +6,33 @@ GET http://localhost:8020/rounds/roundSummary/631eb0f5-be3d-41df-93fe-011490eecf
 
 ###
 
-GET http://localhost:8020/rounds/631eb0f5-be3d-41df-93fe-011490eecfaf
+GET http://localhost:8020/rounds/2770abbb-2b60-4488-a208-58bad2f29d90
 
 ###
 
-DELETE http://localhost:8020/rounds/19df6d95-d29d-4878-b70e-5c43b4db1ef0/Dudeson
+DELETE http://localhost:8020/rounds/2770abbb-2b60-4488-a208-58bad2f29d90/Mannen
 
 ### 
+
+POST http://localhost:8020/rounds/roundEarnings/be994bec-449d-4b78-9f0a-53b3e9d980d5
+Content-Type: application/json
+
+{
+"earnings": 
+  [
+    {
+      "name":"Mannen",
+      "earning":100
+    }
+  ]
+}
+
+###
+
+POST http://localhost:8020/players/earnings
+Content-Type: application/json
+
+{
+"name":"Mannen"
+}
+

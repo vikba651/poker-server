@@ -15,9 +15,15 @@ const DealSchema = new Schema({
   tableCards: [CardSchema],
 })
 
+const RoundEarnings = new Schema({
+  name: String,
+  earning: Number,
+})
+
 const RoundSchema = new Schema({
   _id: String,
   deals: [DealSchema],
+  earnings: [RoundEarnings],
   startTime: Number,
 })
 

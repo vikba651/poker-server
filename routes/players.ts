@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import { PlayerModel } from '../models/players'
 import { RoundModel } from '../models/rounds'
+import { Round } from '../types/round'
 
 const router = Router()
 
@@ -62,6 +63,47 @@ router.delete('/:id', getPlayer, async (req: any, res: any) => {
   }
 })
 
+// Get Player Earnings
+router.get('/earnings', getPlayer, async (req: any, res: any) => {
+  if (res.player !== null) {
+    const roundIds: string[] = res.player.roundIds
+    let rounds: any[] = []
+    if (roundIds.length > 0) {
+      rounds = await RoundModel.find({ _id: { $in: roundIds } })
+    }
+
+    const playerEarnings = rounds.reduce((playerEarning, round) => {
+      const filteredPlayerEarning = round.earnings.filter((earning: any) => {
+        return earning.name === res.player.name
+      })
+
+      if (filteredPlayerEarning.length > 0) {
+        const newPlayerEarning = {
+          name: filteredPlayerEarning[0].name,
+          startTime: round.startTime,
+          earning: filteredPlayerEarning[0].earning,
+          roundId: round.id,
+        }
+        playerEarning.push(newPlayerEarning)
+      }
+      return playerEarning
+    }, [])
+
+    res.json(playerEarnings)
+
+    // const roundsWithEarnings: Round[] = rounds.filter((round: Round)=>{
+    //   const playerEarning = round.earnings.filter((earning)=>{
+    //     return earning.name === res.player.name
+    //   })
+    //   return (playerEarning).length > 0
+    // })
+    // const playerEarnings = roundsWithEarnings.map((round)=>{
+    //   return round
+    // })
+  } else {
+    res.status(404).json({ message: 'Could not find player' })
+  }
+})
 async function getPlayer(req: any, res: any, next: any) {
   let player
   try {

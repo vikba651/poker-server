@@ -3,7 +3,7 @@ import { cardStringToArray, generateDealGiven } from './card-generation'
 import { cardArrayToString, handQualityToString } from './to-strings'
 import { Card, Deal, Player, PlayerCards, Round, Session } from '../types/round'
 import { PlayerCardQuality } from '../types/statistics'
-import PlayerCardQualitySchema from '../models/statistics'
+import { PlayerCardQualityModel } from '../models/statistics'
 import { ranks, suitEmoji, suits } from './constant'
 import mongoose from 'mongoose'
 
@@ -56,7 +56,7 @@ export async function simulateAllPlayerCards(playerAmount: number, iterations: n
     }
   }
 
-  PlayerCardQualitySchema.insertMany(playerCardQualities)
+  PlayerCardQualityModel.insertMany(playerCardQualities)
     .then(() => {
       console.log('Simulations added to the database')
     })

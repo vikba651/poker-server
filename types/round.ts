@@ -3,6 +3,7 @@ import { Socket } from 'socket.io'
 export interface Round {
   _id: string
   deals: Deal[]
+  earnings: PlayerEarning[]
   startTime: number
 }
 export interface Session {
@@ -37,4 +38,9 @@ export interface PlayerCards {
 export interface Card {
   suit: string
   rank: string
+}
+
+export interface PlayerEarning {
+  name: string
+  earning: number
 }
