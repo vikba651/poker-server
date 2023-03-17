@@ -64,7 +64,7 @@ router.delete('/:id', getPlayer, async (req: any, res: any) => {
 })
 
 // Get Player Earnings
-router.get('/earnings', getPlayer, async (req: any, res: any) => {
+router.post('/earnings', getPlayer, async (req: any, res: any) => {
   if (res.player !== null) {
     const roundIds: string[] = res.player.roundIds
     let rounds: any[] = []

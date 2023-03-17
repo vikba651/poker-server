@@ -20,7 +20,7 @@ const router = Router()
 router.get('/', async (req: any, res: any) => {
   try {
     const rounds = await RoundModel.find()
-    res.json(rounds)
+    res.status(200).json(rounds)
   } catch (e: any) {
     res.status(500).json({ message: e.message })
   }
@@ -339,7 +339,7 @@ function handsSummaryToObject(handSummaryMap: Map<string, number>): HandSummary 
 
 // Get one round
 router.get('/:id', getRound, async (req: any, res: any) => {
-  res.json(res.round)
+  res.status(200).json(res.roundModel)
 })
 
 // // Create one round
@@ -416,20 +416,10 @@ router.delete('/:id/:player', getRound, async (req: any, res: any) => {
 })
 
 router.post('/roundEarnings/:id/', getRound, async (req: any, res: any) => {
-  const players = getPlayers(res)
-  let round
+  res.roundModel.earnings = req.body.earnings
   try {
-    round = await RoundModel.findById(req.params.id)
-    if (round == null) {
-      return res.status(404).json({ message: 'Cannot find round' })
-    }
-  } catch (e: any) {
-    return res.status(500).json({ message: e.message })
-  }
-  round.earnings = req.body.earnings
-  try {
-    const updatedRound = await round.save()
-    res.json(round)
+    const updatedRound = await res.roundModel.save()
+    res.json(res.roundModel)
   } catch (e: any) {
     res.status(400).json({ message: e.message })
   }
@@ -445,8 +435,9 @@ async function getRound(req: any, res: any, next: any) {
   } catch (e: any) {
     return res.status(500).json({ message: e.message })
   }
+  //res.roundModel is a mongoose object
+  res.roundModel = round
 
-  // TODO encapsulate the deals cleaning as a middleware function
   const deals: Deal[] = round.deals.map((deal) => {
     const filteredPlayerCards = deal.playerCards.map((playerCards) => {
       return { name: playerCards.name ? playerCards.name : '', cards: filterEmptyCards(playerCards.cards) }
@@ -459,6 +450,7 @@ async function getRound(req: any, res: any, next: any) {
     }
     return filteredDeal
   })
+  // res.round is a javascript object without mongoose methods
   res.round = { ...round, deals }
   next()
 }

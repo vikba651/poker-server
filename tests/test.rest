@@ -6,7 +6,7 @@ GET http://localhost:8020/rounds/roundSummary/631eb0f5-be3d-41df-93fe-011490eecf
 
 ###
 
-GET http://localhost:8020/rounds/2770abbb-2b60-4488-a208-58bad2f29d90
+GET http://localhost:8020/rounds/be994bec-449d-4b78-9f0a-53b3e9d980d5
 
 ###
 
@@ -33,6 +33,14 @@ POST http://localhost:8020/players/earnings
 Content-Type: application/json
 
 {
-"name":"Mannen"
+"name":"Dudeson"
 }
 
+###
+
+POST http://localhost:8020/players/rounds
+Content-Type: application/json
+
+{
+"name":"Dudeson"
+}
