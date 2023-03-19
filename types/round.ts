@@ -13,6 +13,7 @@ export interface Session {
   players: Player[]
   deals: Deal[]
   startTime: number
+  startTracking: boolean
 }
 
 export interface Player {

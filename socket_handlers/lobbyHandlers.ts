@@ -23,6 +23,7 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
       players: [player],
       deals: [],
       startTime: Date.now(),
+      startTracking: false,
     }
     sessions.push(session)
     ws.join(session.id)
@@ -52,15 +53,26 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
   const startTracking = (data: { sessionId: string }) => {
     const sessionId = data.sessionId
     ws.to(sessionId).emit('trackingStarted')
+    let session = sessions.find((session) => session.id === sessionId)
+    if (session) {
+      session.startTracking = true
+    }
   }
 
-  const rejoinSession = (data: { name: string; sessionId: string }) => {
-    ws.join(data.sessionId)
+  const rejoinSession = async (data: { name: string; sessionId: string }) => {
+    await ws.join(data.sessionId)
     let playerSocket = playerSockets.find((playerSocket) => playerSocket.player.name === data.name)
     if (playerSocket) {
       playerSocket.socket = ws
     } else {
       ws.send('Rejoin session failed')
+      return
+    }
+    let session = sessions.find((session) => session.id === session.id)
+    if (session && session.startTracking) {
+      ws.emit('trackingStarted')
+    } else {
+      ws.send('Invalid session id')
     }
   }
 
