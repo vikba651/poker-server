@@ -11,10 +11,7 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
       id: uuidv4(),
       name: data.name,
     }
-    playerSockets.push({
-      socket: ws,
-      player: player,
-    })
+    addPlayerSocket(ws, player)
 
     const session: Session = {
       id: uuidv4(),
@@ -38,11 +35,8 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
         id: uuidv4(),
         name: data.name,
       }
-      playerSockets.push({
-        socket: ws,
-        player: player,
-      })
-      session.players.push(player)
+      addPlayerSocket(ws, player)
+      addPlayerToSession(session, player)
       ws.join(session.id)
       wss.in(session.id).emit('sessionUpdated', session)
     } else {
@@ -50,12 +44,30 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     }
   }
 
+  const leaveSession = (data: { code: string; name: string }) => {
+    sessions = sessions.reduce((newSessions: Session[], session) => {
+      const newPlayers = session.players.filter((player) => {
+        return player.name !== data.name
+      })
+      const newSession = { ...session, players: newPlayers }
+      newSessions.push(newSession)
+      return newSessions
+    }, [])
+    let session = sessions.find((session) => session.code === data.code)
+    if (session) {
+      wss.in(session.id).emit('sessionUpdated', session)
+    } else {
+      ws.send('Invalid session code')
+    }
+  }
+
   const startTracking = (data: { sessionId: string }) => {
-    const sessionId = data.sessionId
-    ws.to(sessionId).emit('trackingStarted')
-    let session = sessions.find((session) => session.id === sessionId)
+    const session = sessions.find((session) => session.id === data.sessionId)
     if (session) {
       session.startTracking = true
+      ws.to(session.id).emit('trackingStarted', session)
+    } else {
+      ws.send('Session id not found')
     }
   }
 
@@ -78,8 +90,28 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
 
   ws.on('createSession', createSession)
   ws.on('joinSession', joinSession)
+  ws.on('leaveSession', leaveSession)
   ws.on('startTracking', startTracking)
   ws.on('rejoinSession', rejoinSession)
+}
+
+const addPlayerToSession = (session: Session, newPlayer: Player) => {
+  const newPlayers = session.players.filter((player) => {
+    return player.name !== newPlayer.name
+  })
+  newPlayers.push(newPlayer)
+  session.players = newPlayers
+}
+
+const addPlayerSocket = (ws: any, player: Player) => {
+  const newPlayerSockets = playerSockets.filter((playerSocket) => {
+    return playerSocket.player.name !== player.name
+  })
+  newPlayerSockets.push({
+    socket: ws,
+    player: player,
+  })
+  playerSockets = newPlayerSockets
 }
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
