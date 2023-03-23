@@ -33,7 +33,7 @@ POST http://localhost:8020/players/earnings
 Content-Type: application/json
 
 {
-"name":"Dudeson"
+"name":"Martin"
 }
 
 ###
