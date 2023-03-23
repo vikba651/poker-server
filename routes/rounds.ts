@@ -35,8 +35,8 @@ router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
       name: player,
       handSummary: getHandResultSummary(req, res, player),
       qualities: getPlayerCardQualities(res, playerHandQualitiesQuery, player),
-      worstDeal: getWorstHandResultPlayer(req, res, player),
-      bestDeal: getBestHandResultPlayer(req, res, player),
+      worstDealIndex: getWorstHandIndexPlayer(req, res, player),
+      bestDealIndex: getBestHandIndexPlayer(req, res, player),
     }
     // See if this modifies all user summaries so only last shows.
     return userSummary
@@ -133,7 +133,7 @@ function getBestHandResultDeal(playerCardsSummaries: PlayerCardsSummary[]) {
   return playerCardsSummaries //bestHands
 }
 
-function getBestHandResultPlayer(req: any, res: any, player: string) {
+function getBestHandIndexPlayer(req: any, res: any, player: string): number {
   let handResults: HandResult[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -145,25 +145,19 @@ function getBestHandResultPlayer(req: any, res: any, player: string) {
     }
   })
   if (handResults.length) {
-    let bestHandResult = handResults.reduce(function (a, b) {
-      if (a.score > b.score) return a
-      return b
-    })
-    return bestHandResult
+    const bestHandIndex = handResults.reduce((maxIndex, currentObject, currentIndex, array) => {
+      if (currentObject.score > array[maxIndex].score) {
+        return currentIndex
+      } else {
+        return maxIndex
+      }
+    }, 0)
+    return bestHandIndex
   }
-  let bestHandResult: HandResult = {
-    hand: '',
-    quads: [],
-    triples: [],
-    pairs: [],
-    bestCards: [],
-    dealtCards: [],
-    score: 0,
-  }
-  return bestHandResult
+  return -1
 }
 
-function getWorstHandResultPlayer(req: any, res: any, player: string): HandResult {
+function getWorstHandIndexPlayer(req: any, res: any, player: string): number {
   let handResults: HandResult[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -175,22 +169,16 @@ function getWorstHandResultPlayer(req: any, res: any, player: string): HandResul
     }
   })
   if (handResults.length) {
-    let worstHandResult = handResults.reduce(function (a, b) {
-      if (a.score < b.score) return a
-      return b
-    })
-    return worstHandResult
+    const worstHandIndex = handResults.reduce((maxIndex, currentObject, currentIndex, array) => {
+      if (currentObject.score < array[maxIndex].score) {
+        return currentIndex
+      } else {
+        return maxIndex
+      }
+    }, 0)
+    return worstHandIndex
   }
-  let worstHandResult: HandResult = {
-    hand: '',
-    quads: [],
-    triples: [],
-    pairs: [],
-    bestCards: [],
-    dealtCards: [],
-    score: 0,
-  }
-  return worstHandResult
+  return -1
 }
 
 function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): DealSummary[] {

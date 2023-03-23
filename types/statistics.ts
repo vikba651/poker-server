@@ -18,8 +18,8 @@ export interface UserSummary {
   name: string
   handSummary: HandSummary
   qualities: number[]
-  worstDeal: HandResult
-  bestDeal: HandResult
+  worstDealIndex: number
+  bestDealIndex: number
 }
 
 export interface HandSummary {
