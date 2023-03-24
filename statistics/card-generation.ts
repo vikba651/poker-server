@@ -1,4 +1,6 @@
 import { suits, ranks } from './constant'
+import { Card, PlayerCards } from '../types/round'
+import { getHandResult } from './poker-logic'
 
 export function cardStringToArray(handString: string) {
   let cardArray = handString.split(' ').map((card) => {
@@ -10,7 +12,7 @@ export function cardStringToArray(handString: string) {
   return cardArray
 }
 
-function sampleArray(array: any, n: any) {
+export function pickFromDeck(array: Card[], n: number) {
   // Modifies array inplace
   let samples = []
   for (let i = 0; i < n; i++) {
@@ -21,7 +23,7 @@ function sampleArray(array: any, n: any) {
   return samples
 }
 
-function customIncludes(sourceCards: any, targetCard: any) {
+export function includesCard(sourceCards: Card[], targetCard: Card): boolean {
   for (let card of sourceCards) {
     if (card.suit === targetCard.suit && card.rank === targetCard.rank) {
       return true
@@ -30,11 +32,8 @@ function customIncludes(sourceCards: any, targetCard: any) {
   return false
 }
 
-export function generateDealGiven(playerCards: any, playerAmount: any) {
-  if (playerAmount > 20) {
-    throw 'You cant have more than 20 players!'
-  }
-  let deck: any = []
+export function getDeck(): Card[] {
+  const deck: Card[] = []
   ranks.forEach((rank) => {
     suits.forEach((suit) => {
       deck.push({
@@ -43,18 +42,26 @@ export function generateDealGiven(playerCards: any, playerAmount: any) {
       })
     })
   })
+  return deck
+}
+
+export function generateDeal1Player(playerCards: Card[], playerAmount: number) {
+  if (playerAmount > 20) {
+    throw 'You cant have more than 20 players!'
+  }
+  let deck = getDeck()
   // playerCards = cardStringToArray(playerCards)
 
-  deck = deck.filter((card: any) => {
-    return !customIncludes(playerCards, card)
+  deck = deck.filter((card) => {
+    return !includesCard(playerCards, card)
   })
-  let tableCards = sampleArray(deck, 5)
+  let tableCards = pickFromDeck(deck, 5)
 
-  let generated_hands = [playerCards.concat(tableCards)]
+  let generatedHands = [playerCards.concat(tableCards)]
 
   for (let i = 0; i < playerAmount - 1; i++) {
-    let opponentCards = sampleArray(deck, 2)
-    generated_hands.push(opponentCards.concat(tableCards))
+    let opponentCards = pickFromDeck(deck, 2)
+    generatedHands.push(opponentCards.concat(tableCards))
   }
-  return generated_hands
+  return generatedHands
 }

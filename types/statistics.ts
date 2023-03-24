@@ -52,3 +52,11 @@ export interface PlayerCardQuality {
   playerAmount: number
   iterations: number
 }
+
+export interface PlayerWinProbabilities {
+  name: string
+  preFlop: number
+  flop?: number
+  turn?: number
+  river?: number
+}

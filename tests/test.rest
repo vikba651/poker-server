@@ -2,11 +2,11 @@ GET http://localhost:8020/rounds
 
 ###
 
-GET http://localhost:8020/rounds/roundSummary/631eb0f5-be3d-41df-93fe-011490eecfaf
+GET http://localhost:8020/rounds/roundSummary/08c159e5-af04-4cf8-bc26-fa9b1dd96027
 
 ###
 
-GET http://localhost:8020/rounds/be994bec-449d-4b78-9f0a-53b3e9d980d5
+GET http://localhost:8020/rounds/08c159e5-af04-4cf8-bc26-fa9b1dd96027
 
 ###
 
@@ -44,3 +44,7 @@ Content-Type: application/json
 {
 "name":"Dudeson"
 }
+
+###
+
+GET http://localhost:8020/rounds/dealWinProbabilities/08c159e5-af04-4cf8-bc26-fa9b1dd96027/0
