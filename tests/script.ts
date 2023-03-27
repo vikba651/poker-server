@@ -1,6 +1,3 @@
-import mongoose from 'mongoose'
-import { cardStringToArray } from '../statistics/card-generation'
-import { simulateAllPlayerCards, simulatePlayerCards } from '../statistics/simulations'
 import { getHandResult } from '../statistics/poker-logic'
 
 let handResult = getHandResult([

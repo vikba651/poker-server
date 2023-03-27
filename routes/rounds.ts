@@ -3,7 +3,7 @@ import { Card, Deal, Player, PlayerCards, PlayerEarning, Round, Session } from '
 import { RoundModel } from '../models/rounds'
 import { PlayerModel } from '../models/players'
 import { PlayerCardQualityModel } from '../models/statistics'
-import { getPlayerCardsKey } from '../statistics/simulations'
+import { getDealWinProbabilities, getPlayerCardsKey } from '../statistics/simulations'
 import { getHandResult } from '../statistics/poker-logic'
 import {
   DealSummary,
@@ -201,6 +201,7 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
           winRate = playerCardQuality.winRate
           percentile = playerCardQuality.percentile
         } else {
+          // TODO if missing simulate, add to database and add to playerCardQuality
           console.log(`Missing simulations for ${getPlayerCardsKey(playerCards.cards)}`)
         }
         if (deal.tableCards.length >= 3) {
@@ -325,6 +326,20 @@ function handsSummaryToObject(handSummaryMap: Map<string, number>): HandSummary 
   return handSummary
 }
 
+router.get('/dealWinProbabilities/:id/:dealNumber', getRound, async (req: any, res: any) => {
+  let deal = res.round.deals[req.params.dealNumber]
+  if (!deal) {
+    res.status(500).json({ message: "Deal doesn't exist" })
+  }
+  deal.playerCards = deal.playerCards.filter((playerCards: PlayerCards) => {
+    return playerCards.cards.length == 2
+  })
+  if (!deal.playerCards) {
+    res.status(500).json({ message: "Player Cards doesn't exist on this deal" })
+  }
+  res.status(200).json(getDealWinProbabilities(deal))
+})
+
 // Get one round
 router.get('/:id', getRound, async (req: any, res: any) => {
   res.status(200).json(res.roundModel)
@@ -369,8 +384,6 @@ router.delete('/:id/:player', getRound, async (req: any, res: any) => {
   let playerModel = playerModels.find((playerModel) => {
     return playerModel.name == req.params.player
   })
-  console.log(playerModel)
-
   if (!playerModel) {
     return res.status(500).json({ message: 'Cannot find player' })
   }
@@ -391,8 +404,6 @@ router.delete('/:id/:player', getRound, async (req: any, res: any) => {
 
   if (!existsInPlayers) {
     try {
-      console.log(playerModels)
-
       await RoundModel.deleteOne({ _id: req.params.id })
       res.json({ message: 'Deleted round' })
     } catch (e: any) {

@@ -24,12 +24,6 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     }
     sessions.push(session)
     ws.join(session.id)
-    sessions.forEach((session) => {
-      console.log(
-        session.code,
-        session.players.map((player) => player.name)
-      )
-    })
     if (typeof callback == 'function') {
       callback(session)
     }
@@ -38,7 +32,6 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
 
   const joinSession = (data: { code: string; name: string }, callback: any) => {
     let session = sessions.find((session) => session.code === data.code)
-
     if (session) {
       const player: Player = {
         id: uuidv4(),
@@ -48,12 +41,6 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
       addPlayerToSession(session, player)
       ws.join(session.id)
       ws.to(session.id).emit('sessionUpdated', session)
-      sessions.forEach((session) => {
-        console.log(
-          session.code,
-          session.players.map((player) => player.name)
-        )
-      })
       if (typeof callback == 'function') {
         callback(session)
       }
@@ -70,12 +57,6 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
       session.players.splice(playerIndex)
       ws.to(session.id).emit('sessionUpdated', session)
       ws.leave(session.id)
-      sessions.forEach((session) => {
-        console.log(
-          session.code,
-          session.players.map((player) => player.name)
-        )
-      })
       if (typeof callback == 'function') {
         callback()
       }
@@ -89,12 +70,6 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     if (sessionIndex > -1) {
       wss.in(sessions[sessionIndex].id).emit('sessionUpdated', null)
       sessions.splice(sessionIndex)
-      sessions.forEach((session) => {
-        console.log(
-          session.code,
-          session.players.map((player) => player.name)
-        )
-      })
     }
   }
 
