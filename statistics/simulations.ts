@@ -324,7 +324,7 @@ function simulationWinnersToPhaseWinProbabilities(
   simulations: Simulation[],
   allPlayerCards: PlayerCards[]
 ): PhaseWinProbability[] {
-  const SimulationsWinners = simulations.map((simulation) => {
+  const simulationsWinnersArray = simulations.map((simulation) => {
     const amountOfWinners = simulation.playerScores.reduce((currentAmountOfWinners, playerScore) => {
       if (playerScore.score == simulation.maxScore) {
         return currentAmountOfWinners + 1
@@ -347,12 +347,12 @@ function simulationWinnersToPhaseWinProbabilities(
     return { name: playerCards.name, wins: 0 }
   })
 
-  const phaseTotalWins = SimulationsWinners.reduce((currentWinnersCount, simulationWinners) => {
+  const phaseTotalWins = simulationsWinnersArray.reduce((currentWinnersCount, simulationWinners) => {
     return currentWinnersCount.map((currentWinnerCount) => {
       let win = 0
       if (simulationWinners) {
         const tempWin = simulationWinners.find((simulationWinner) => {
-          simulationWinner.name == currentWinnerCount.name
+          return simulationWinner.name == currentWinnerCount.name
         })?.win
         if (tempWin) win = win + tempWin
       }

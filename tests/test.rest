@@ -47,4 +47,4 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8020/rounds/dealWinProbabilities/08c159e5-af04-4cf8-bc26-fa9b1dd96027/0
+GET http://localhost:8020/rounds/dealWinProbabilities/08c159e5-af04-4cf8-bc26-fa9b1dd96027/1
