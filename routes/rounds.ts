@@ -337,8 +337,6 @@ router.get('/dealWinProbabilities/:id/:dealNumber', getRound, async (req: any, r
   if (!deal.playerCards) {
     res.status(500).json({ message: "Player Cards doesn't exist on this deal" })
   }
-
-  console.log(JSON.stringify(deal))
   res.status(200).json(getDealWinProbabilities(deal))
 })
 
@@ -386,8 +384,6 @@ router.delete('/:id/:player', getRound, async (req: any, res: any) => {
   let playerModel = playerModels.find((playerModel) => {
     return playerModel.name == req.params.player
   })
-  console.log(playerModel)
-
   if (!playerModel) {
     return res.status(500).json({ message: 'Cannot find player' })
   }
@@ -408,8 +404,6 @@ router.delete('/:id/:player', getRound, async (req: any, res: any) => {
 
   if (!existsInPlayers) {
     try {
-      console.log(playerModels)
-
       await RoundModel.deleteOne({ _id: req.params.id })
       res.json({ message: 'Deleted round' })
     } catch (e: any) {

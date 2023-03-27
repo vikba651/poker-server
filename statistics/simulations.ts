@@ -148,27 +148,18 @@ export function getDealWinProbabilities(deal: Deal | DealSummary): PlayerWinProb
     riverWinProbability = getRiverWinProbability(deal.playerCards, deal.tableCards)
   }
   const dealWinProbabilities = deal.playerCards.map((playerCards) => {
-    let playerWinProbabilities: PlayerWinProbabilities = {
+    const playerWinProbabilities: PlayerWinProbabilities = {
       name: playerCards.name,
-      preFlop: findProbability(preFlopWinProbability, playerCards.name),
+      probabilities: [findProbability(preFlopWinProbability, playerCards.name)],
     }
     if (flopWinProbability) {
-      playerWinProbabilities = {
-        flop: findProbability(flopWinProbability, playerCards.name),
-        ...playerWinProbabilities,
-      }
+      playerWinProbabilities.probabilities.push(findProbability(flopWinProbability, playerCards.name))
     }
     if (turnWinProbability) {
-      playerWinProbabilities = {
-        turn: findProbability(turnWinProbability, playerCards.name),
-        ...playerWinProbabilities,
-      }
+      playerWinProbabilities.probabilities.push(findProbability(turnWinProbability, playerCards.name))
     }
     if (riverWinProbability) {
-      playerWinProbabilities = {
-        river: findProbability(riverWinProbability, playerCards.name),
-        ...playerWinProbabilities,
-      }
+      playerWinProbabilities.probabilities.push(findProbability(riverWinProbability, playerCards.name))
     }
     return playerWinProbabilities
   })
@@ -178,7 +169,6 @@ export function getDealWinProbabilities(deal: Deal | DealSummary): PlayerWinProb
 function findProbability(phaseWinProbabilities: PhaseWinProbability[], name: string): number {
   const found = phaseWinProbabilities.find((e) => e.name == name)
   if (found) {
-    console.log(found)
     return found.probability
   }
   return 0

@@ -55,8 +55,5 @@ export interface PlayerCardQuality {
 
 export interface PlayerWinProbabilities {
   name: string
-  preFlop: number
-  flop?: number
-  turn?: number
-  river?: number
+  probabilities: number[]
 }
