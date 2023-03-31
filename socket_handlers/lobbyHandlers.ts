@@ -6,6 +6,17 @@ export let sessions: Session[] = []
 export let playerSockets: PlayerSocket[] = []
 
 export function registerLobbyHandlers(wss: Server, ws: Socket) {
+  const findMyActiveSessions = (data: { name: string }, callback: any) => {
+    const activeSession = sessions
+      .filter((session) => session.startTracking)
+      .find((session) => session.players.find((player) => player.name === data.name))
+    if (activeSession) {
+      callback(activeSession.id)
+    } else {
+      callback()
+    }
+  }
+
   const createSession = (data: { name: string; location: any }, callback: any) => {
     const player: Player = {
       id: uuidv4(),
@@ -50,12 +61,16 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
   }
 
   const leaveSession = (data: { code: string; name: string }, callback: any) => {
-    const sessionId = sessions.findIndex((session) => session.code === data.code)
-    let session = sessions[sessionId]
+    const sessionIndex = sessions.findIndex((session) => session.code === data.code)
+    let session = sessions[sessionIndex]
     if (session) {
       const playerIndex = session.players.findIndex((player) => player.name === data.name)
-      session.players.splice(playerIndex)
-      ws.to(session.id).emit('sessionUpdated', session)
+      session.players.splice(playerIndex, 1)
+      if (session.players.length === 0) {
+        sessions.splice(sessionIndex, 1)
+      } else {
+        ws.to(session.id).emit('sessionUpdated', session)
+      }
       ws.leave(session.id)
       if (typeof callback == 'function') {
         callback()
@@ -69,7 +84,7 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     const sessionIndex = sessions.findIndex((session) => session.code === data.code)
     if (sessionIndex > -1) {
       wss.in(sessions[sessionIndex].id).emit('sessionUpdated', null)
-      sessions.splice(sessionIndex)
+      sessions.splice(sessionIndex, 1)
     }
   }
 
@@ -77,13 +92,13 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
     const session = sessions.find((session) => session.id === data.sessionId)
     if (session) {
       session.startTracking = true
-      ws.to(session.id).emit('trackingStarted', session)
+      ws.to(session.id).emit('trackingStarted')
     } else {
       ws.send('Session id not found')
     }
   }
 
-  const rejoinSession = async (data: { name: string; sessionId: string }) => {
+  const rejoinSession = async (data: { name: string; sessionId: string }, callback: any) => {
     await ws.join(data.sessionId)
     let playerSocket = playerSockets.find((playerSocket) => playerSocket.player.name === data.name)
     if (playerSocket) {
@@ -92,14 +107,18 @@ export function registerLobbyHandlers(wss: Server, ws: Socket) {
       ws.send('Rejoin session failed')
       return
     }
-    let session = sessions.find((session) => session.id === session.id)
+    let session = sessions.find((session) => session.id === data.sessionId)
     if (session && session.startTracking) {
-      ws.emit('trackingStarted')
+      // ws.emit('trackingStarted', session)
+      if (typeof callback == 'function') {
+        callback(session)
+      }
     } else {
       ws.send('Invalid session id')
     }
   }
 
+  ws.on('findMyActiveSessions', findMyActiveSessions)
   ws.on('createSession', createSession)
   ws.on('joinSession', joinSession)
   ws.on('leaveSession', leaveSession)
@@ -125,6 +144,16 @@ const addPlayerSocket = (ws: any, player: Player) => {
     player: player,
   })
   playerSockets = newPlayerSockets
+}
+
+function logSessions() {
+  for (const session of sessions) {
+    console.log(
+      `code=${session.code}, players=${session.players.map((player) => player.name)}, startedTracking=${
+        session.startTracking
+      } id=${session.id}`
+    )
+  }
 }
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
