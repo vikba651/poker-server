@@ -110,7 +110,7 @@ export function getHandResult(cardArray: Card[]): HandResult {
     let score = 0
     cardArray.forEach((card) => {
       score += ranks.indexOf(card.rank) * base
-      base *= 13
+      base *= 100
     })
 
     score += (hands.length - hands.indexOf(hand)) * base
