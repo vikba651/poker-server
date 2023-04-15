@@ -1,17 +1,16 @@
-import dotenv from 'dotenv'
-import express, { Express, json, Request, Response } from 'express'
-import { createServer } from 'http'
-import { Server, Socket } from 'socket.io'
-import * as mongoose from 'mongoose'
 import * as bodyParser from 'body-parser'
+import dotenv from 'dotenv'
+import express, { Express, Request, Response } from 'express'
+import { createServer } from 'http'
+import * as mongoose from 'mongoose'
 import { networkInterfaces } from 'os'
+import { Server, Socket } from 'socket.io'
 
-import roundsRouter from './routes/rounds'
 import playersRouter from './routes/players'
-import { registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
+import roundsRouter from './routes/rounds/rounds'
 import { registerLobbyHandlers } from './socket_handlers/lobbyHandlers'
+import { registerTrackGameHandlers } from './socket_handlers/trackGameHandlers'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './types/websocket'
-import { simulateAllPlayerCards } from './statistics/simulations'
 
 dotenv.config()
 

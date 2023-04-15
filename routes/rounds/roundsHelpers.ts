@@ -1,55 +1,12 @@
-import { Router } from 'express'
-import { Card, Deal, Player, PlayerCards, PlayerEarning, Round, Session } from '../types/round'
-import { RoundModel } from '../models/rounds'
-import { PlayerModel } from '../models/players'
-import { PlayerCardQualityModel } from '../models/statistics'
-import { getDealWinProbabilities, getPlayerCardsKey } from '../statistics/simulations'
-import { getHandResult } from '../statistics/poker-logic'
-import {
-  DealSummary,
-  HandResult,
-  HandSummary,
-  PlayerCardsSummary,
-  RoundStatistics,
-  UserSummary,
-} from '../types/statistics'
-import { hands } from '../statistics/constant'
+import { RoundModel } from '../../models/rounds'
+import { PlayerCardQualityModel } from '../../models/statistics'
+import { hands } from '../../statistics/constant'
+import { getHandResult } from '../../statistics/poker-logic'
+import { getPlayerCardsKey } from '../../statistics/simulations'
+import { Card, Deal, PlayerCards } from '../../types/round'
+import { DealSummary, HandResult, HandSummary, PlayerCardsSummary } from '../../types/statistics'
 
-const router = Router()
-// Get all rounds
-router.get('/', async (req: any, res: any) => {
-  try {
-    const rounds = await RoundModel.find()
-    res.status(200).json(rounds)
-  } catch (e: any) {
-    res.status(500).json({ message: e.message })
-  }
-})
-
-router.get('/roundSummary/:id/', getRound, async (req: any, res: any) => {
-  const players = getPlayers(res)
-  const playerHandQualitiesQuery = await queryPlayerHandQualities(res)
-
-  let userSummaries: UserSummary[] = players.map((player) => {
-    const userSummary = {
-      name: player,
-      handSummary: getHandResultSummary(req, res, player),
-      qualities: getPlayerCardQualities(res, playerHandQualitiesQuery, player),
-      worstDealIndex: getWorstHandIndexPlayer(req, res, player),
-      bestDealIndex: getBestHandIndexPlayer(req, res, player),
-    }
-    // See if this modifies all user summaries so only last shows.
-    return userSummary
-  })
-
-  const roundStatistic: RoundStatistics = {
-    userSummaries,
-    deals: getDealSummary(req, res, playerHandQualitiesQuery),
-  }
-  res.json(roundStatistic)
-})
-
-function getPlayers(res: any) {
+export function getPlayers(res: any) {
   let players: string[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -62,7 +19,7 @@ function getPlayers(res: any) {
   return players
 }
 
-async function queryPlayerHandQualities(res: any) {
+export async function queryPlayerHandQualities(res: any) {
   let playerCardKeys: string[] = []
   let playerAmounts: number[] = []
 
@@ -95,7 +52,7 @@ async function queryPlayerHandQualities(res: any) {
   return playerHandQualitiesQuery
 }
 
-function getPlayerCardQualities(res: any, playerHandQualitiesQuery: any, player: string): number[] {
+export function getPlayerCardQualities(res: any, playerHandQualitiesQuery: any, player: string): number[] {
   let playerCardQualities: number[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -119,7 +76,7 @@ function getPlayerCardQualities(res: any, playerHandQualitiesQuery: any, player:
   return playerCardQualities
 }
 
-function getBestHandResultDeal(playerCardsSummaries: PlayerCardsSummary[]) {
+export function getBestHandResultDeal(playerCardsSummaries: PlayerCardsSummary[]) {
   if (playerCardsSummaries.length) {
     const bestHandResult = playerCardsSummaries.reduce((a, b) => {
       if (a.score > b.score) return a
@@ -133,7 +90,7 @@ function getBestHandResultDeal(playerCardsSummaries: PlayerCardsSummary[]) {
   return playerCardsSummaries //bestHands
 }
 
-function getBestHandIndexPlayer(req: any, res: any, player: string): number {
+export function getBestHandIndexPlayer(req: any, res: any, player: string): number {
   let handResults: HandResult[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -157,7 +114,7 @@ function getBestHandIndexPlayer(req: any, res: any, player: string): number {
   return -1
 }
 
-function getWorstHandIndexPlayer(req: any, res: any, player: string): number {
+export function getWorstHandIndexPlayer(req: any, res: any, player: string): number {
   let handResults: HandResult[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -181,7 +138,7 @@ function getWorstHandIndexPlayer(req: any, res: any, player: string): number {
   return -1
 }
 
-function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): DealSummary[] {
+export function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): DealSummary[] {
   let deals: DealSummary[] = []
 
   res.round.deals.forEach((deal: Deal) => {
@@ -252,7 +209,7 @@ function getDealSummary(req: any, res: any, playerHandQualitiesQuery: any): Deal
   return deals
 }
 
-function getHandResultSummary(req: any, res: any, player: string) {
+export function getHandResultSummary(req: any, res: any, player: string) {
   let handResultSummary = new Map([
     ['Straight flush', 0],
     ['Four of a kind', 0],
@@ -277,7 +234,7 @@ function getHandResultSummary(req: any, res: any, player: string) {
   return handsSummaryToObject(handResultSummary)
 }
 
-function handsSummaryToObject(handSummaryMap: Map<string, number>): HandSummary {
+export function handsSummaryToObject(handSummaryMap: Map<string, number>): HandSummary {
   let handSummary: HandSummary = {
     straightFlushes: 0,
     quads: 0,
@@ -326,105 +283,7 @@ function handsSummaryToObject(handSummaryMap: Map<string, number>): HandSummary 
   return handSummary
 }
 
-router.get('/dealWinProbabilities/:id/:dealNumber', getRound, async (req: any, res: any) => {
-  let deal = res.round.deals[req.params.dealNumber]
-  if (!deal) {
-    res.status(500).json({ message: "Deal doesn't exist" })
-  }
-  deal.playerCards = deal.playerCards.filter((playerCards: PlayerCards) => {
-    return playerCards.cards.length == 2
-  })
-  if (!deal.playerCards) {
-    res.status(500).json({ message: "Player Cards doesn't exist on this deal" })
-  }
-  res.status(200).json(getDealWinProbabilities(deal))
-})
-
-// Get one round
-router.get('/:id', getRound, async (req: any, res: any) => {
-  res.status(200).json(res.roundModel)
-})
-
-// // Create one round
-// router.post('/', async (req: any, res: any) => {
-//   const round = new RoundModel(req.body)
-
-//   try {
-//     const newRound = await round.save()
-//     res.status(200).json(newRound)
-//   } catch (e: any) {
-//     res.status(400)
-//   }
-// })
-
-// // Update one round
-// router.patch('/:id', getRound, async (req: any, res: any) => {
-//   if (req.body.deals != null) {
-//     res.round.deals = req.body.deals
-//   }
-
-//   try {
-//     const updatedRound = await res.round.save()
-//     res.json(res.round)
-//   } catch (e: any) {
-//     res.status(400).json({ message: e.message })
-//   }
-// })
-
-// Delete one round
-router.delete('/:id/:player', getRound, async (req: any, res: any) => {
-  const players = getPlayers(res)
-
-  const playerModels = await PlayerModel.find({
-    name: {
-      $in: players,
-    },
-  })
-
-  let playerModel = playerModels.find((playerModel) => {
-    return playerModel.name == req.params.player
-  })
-  if (!playerModel) {
-    return res.status(500).json({ message: 'Cannot find player' })
-  }
-
-  playerModel.roundIds = playerModel.roundIds.filter((roundId) => {
-    return roundId !== req.params.id
-  })
-  await playerModel.save()
-
-  let existsInPlayers = false
-  playerModels.forEach((playerModel) => {
-    playerModel.roundIds.forEach((roundId) => {
-      if (roundId === req.params.id) {
-        existsInPlayers = true
-      }
-    })
-  })
-
-  if (!existsInPlayers) {
-    try {
-      await RoundModel.deleteOne({ _id: req.params.id })
-      res.json({ message: 'Deleted round' })
-    } catch (e: any) {
-      res.status(500).json({ message: e.message })
-    }
-  } else {
-    res.json({ message: `Round deleted for player ${req.params.player}` })
-  }
-})
-
-router.post('/roundEarnings/:id/', getRound, async (req: any, res: any) => {
-  res.roundModel.earnings = req.body.earnings
-  try {
-    const updatedRound = await res.roundModel.save()
-    res.json(res.roundModel)
-  } catch (e: any) {
-    res.status(400).json({ message: e.message })
-  }
-})
-
-async function getRound(req: any, res: any, next: any) {
+export async function getRound(req: any, res: any, next: any) {
   let round
   try {
     round = await RoundModel.findById(req.params.id)
@@ -454,7 +313,7 @@ async function getRound(req: any, res: any, next: any) {
   next()
 }
 
-function filterEmptyCards(cards: any): Card[] {
+export function filterEmptyCards(cards: any): Card[] {
   let filteredCards: Card[] = []
   cards.forEach((card: any) => {
     if (card.suit && card.rank) {
@@ -463,6 +322,3 @@ function filterEmptyCards(cards: any): Card[] {
   })
   return filteredCards
 }
-
-// router.post
-export default router

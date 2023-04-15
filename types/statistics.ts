@@ -16,6 +16,7 @@ export interface RoundStatistics {
 
 export interface UserSummary {
   name: string
+  achievement: Achievement
   handSummary: HandSummary
   qualities: number[]
   worstDealIndex: number
@@ -56,4 +57,9 @@ export interface PlayerCardQuality {
 export interface PlayerWinProbabilities {
   name: string
   probabilities: number[]
+}
+
+export interface Achievement {
+  title: string
+  description: string
 }
