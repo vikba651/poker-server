@@ -1,5 +1,5 @@
-import { DealSummary } from '../types/statistics'
-import { getHandResult } from '../statistics/poker-logic'
+import { DealSummary } from '../../types/statistics'
+import { getHandResult } from '../../statistics/poker-logic'
 
 export function StraightClutchScore(name: string, dealSummaries: DealSummary[]) {
   let score = 0
