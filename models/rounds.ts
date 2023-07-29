@@ -25,6 +25,7 @@ const RoundSchema = new Schema({
   deals: [DealSchema],
   earnings: [RoundEarnings],
   startTime: Number,
+  emoji: String
 })
 
 export const RoundModel = model('Round', RoundSchema)

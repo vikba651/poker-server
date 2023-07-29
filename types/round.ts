@@ -5,6 +5,7 @@ export interface Round {
   deals: Deal[]
   earnings: PlayerEarning[]
   startTime: number
+  emoji: string
 }
 export interface Session {
   id: string

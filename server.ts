@@ -21,12 +21,12 @@ const nets = networkInterfaces()
 let localAddr: string
 
 try {
-  localAddr = nets.en0?.find((net) => net.family === 'IPv4')?.address ?? 'localhost'
+  localAddr = nets.WiFi?.find((net) => net.family === 'IPv4')?.address ?? 'localhost'
 } catch (error) {
   console.log('Could not get local IP')
 }
-
 const port: number = process.env.PORT ? +process.env.PORT : 8999
+
 server
   .listen(port, () => {
     console.log(`Server started on http://${localAddr}:${port} :)`)
@@ -43,6 +43,7 @@ server
 
 mongoose.connect(`${process.env.DATABASE_URL}`, (error) => {
   if (error) {
+    console.log(error)
     console.log('Could not connect to Mongoose')
   } else {
     console.log('Connected to Mongoose')

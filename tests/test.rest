@@ -6,11 +6,11 @@ GET http://localhost:8020/rounds/roundSummary/08c159e5-af04-4cf8-bc26-fa9b1dd960
 
 ###
 
-GET http://localhost:8020/rounds/08c159e5-af04-4cf8-bc26-fa9b1dd96027
+GET http://localhost:8020/rounds/bc571cc2-fa97-4bd6-b70c-d30473f31aba
 
 ###
 
-DELETE http://localhost:8020/rounds/2770abbb-2b60-4488-a208-58bad2f29d90/Mannen
+DELETE http://localhost:8020/rounds/bc571cc2-fa97-4bd6-b70c-d30473f31aba/Eric
 
 ### 
 
