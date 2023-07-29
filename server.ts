@@ -21,10 +21,15 @@ const nets = networkInterfaces()
 let localAddr: string
 
 try {
-  localAddr = nets.en0?.find((net) => net.family === 'IPv4')?.address ?? 'localhost'
+  if (process.platform === "darwin") {
+    localAddr = nets.en0?.find((net) => net.family === 'IPv4')?.address ?? 'localhost'
+  } else {
+  localAddr = nets.WiFi?.find((net) => net.family === 'IPv4')?.address ?? 'localhost'
+}
 } catch (error) {
   console.log('Could not get local IP')
 }
+
 
 const port: number = process.env.PORT ? +process.env.PORT : 8999
 server
